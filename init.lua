@@ -408,6 +408,14 @@ require('lazy').setup({
     end,
   },
 
+  {
+    'neovim/nvim-lspconfig',
+    'williamboman/mason.nvim',
+    opts = function(_, opts)
+      opts.ensure_installed = opts.ensure_installed or {}
+      vim.list_extend(opts.ensure_installed, { 'goimports', 'gofumpt', 'gomodifytags', 'impl', 'delve' })
+    end,
+  },
   { -- LSP Configuration & Plugins
     'neovim/nvim-lspconfig',
     dependencies = {
@@ -566,8 +574,49 @@ require('lazy').setup({
       --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
       local servers = {
         -- clangd = {},
-        -- gopls = {},
-        -- pyright = {},
+        gopls = {
+          keys = {
+            -- Workaround for the lack of a DAP strategy in neotest-go: https://github.com/nvim-neotest/neotest-go/issues/12
+            { '<leader>td', "<cmd>lua require('dap-go').debug_test()<CR>", desc = 'Debug Nearest (Go)' },
+          },
+          settings = {
+            gopls = {
+              gofumpt = true,
+              codelenses = {
+                gc_details = false,
+                generate = true,
+                regenerate_cgo = true,
+                run_govulncheck = true,
+                test = true,
+                tidy = true,
+                upgrade_dependency = true,
+                vendor = true,
+              },
+              hints = {
+                assignVariableTypes = true,
+                compositeLiteralFields = true,
+                compositeLiteralTypes = true,
+                constantValues = true,
+                functionTypeParameters = true,
+                parameterNames = true,
+                rangeVariableTypes = true,
+              },
+              analyses = {
+                fieldalignment = true,
+                nilness = true,
+                unusedparams = true,
+                unusedwrite = true,
+                useany = true,
+              },
+              usePlaceholders = true,
+              completeUnimported = true,
+              staticcheck = true,
+              directoryFilters = { '-.git', '-.vscode', '-.idea', '-.vscode-test', '-node_modules' },
+              semanticTokens = true,
+            },
+          },
+        },
+        pyright = {},
         -- rust_analyzer = {},
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
         --
@@ -835,7 +884,7 @@ require('lazy').setup({
     'nvim-treesitter/nvim-treesitter',
     build = ':TSUpdate',
     opts = {
-      ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'vim', 'vimdoc' },
+      ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'vim', 'vimdoc', 'go', 'gomod', 'gowork', 'gosum' },
       -- Autoinstall languages that are not installed
       auto_install = true,
       highlight = {
@@ -920,7 +969,27 @@ require('packer').startup(function(use)
   use 'wbthomason/packer.nvim'
   use 'kaicataldo/material.vim'
   use 'ntpeters/vim-better-whitespace'
+  use 'hashivim/vim-terraform'
+  use 'rebelot/kanagawa.nvim'
+  -- treesitter provides better syntax highlight
+  -- If seeing issues with folding or updating just disable it
+  use {
+    'nvim-treesitter/nvim-treesitter',
+    run = ':TSUpdate',
+  }
+  use 'nvim-lua/plenary.nvim'
+  use 'nvim-telescope/telescope.nvim'
+  use 'neovim/nvim-lspconfig'
+  use 'hrsh7th/nvim-cmp'
+  use 'doums/darcula'
 end)
+
+require('nvim-treesitter.configs').setup {
+  ensure_installed = { 'lua', 'python', 'go' },
+  highlight = {
+    enable = true,
+  },
+}
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
@@ -1027,7 +1096,9 @@ set background=dark
 
 let g:airline_theme='material'
 "let g:material_theme_style = 'darker'
-colorscheme material
+"colorscheme material
+"colorscheme kanagawa
+colorscheme darcula
 
 hi Normal       ctermbg=NONE guibg=NONE
 hi SignColumn   ctermbg=235 guibg=#262626
