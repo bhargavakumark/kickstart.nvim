@@ -986,6 +986,12 @@ require('packer').startup(function(use)
   use 'hrsh7th/cmp-cmdline'
   use 'hrsh7th/nvim-cmp'
   use 'doums/darcula'
+
+  use 'golang/vscode-go'
+  --use 'hrsh7th/cmp-vsnip'
+  --use 'hrsh7th/vim-vsnip'
+  use 'L3MON4D3/LuaSnip'
+  use 'saadparwaiz1/cmp_luasnip'
 end)
 
 require('nvim-treesitter.configs').setup {
