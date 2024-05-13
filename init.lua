@@ -913,6 +913,30 @@ require('lazy').setup({
     end,
   },
 
+  {
+    'doums/darcula',
+  },
+  {
+    'folke/trouble.nvim',
+    dependencies = { 'nvim-tree/nvim-web-devicons' },
+    opts = {
+      -- your configuration comes here
+      -- or leave it empty to use the default settings
+      -- refer to the configuration section below
+    },
+  },
+  {
+    'onsails/diaglist.nvim',
+    -- optional settings
+    -- below are defaults
+    debug = false,
+
+    -- increase for noisy servers
+    debounce_ms = 150,
+  },
+  {
+    'onsails/lspkind.nvim',
+  },
   -- The following two comments only work if you have downloaded the kickstart repo, not just copy pasted the
   -- init.lua. If you want these files, they are in the repository, so you can just download them and
   -- place them in the correct locations.
@@ -964,9 +988,14 @@ if vim.fn.empty(vim.fn.glob(packer_path)) > 0 then
 end
 vim.opt.rtp:prepend(packer_path)
 
+vim.opt.completeopt = { 'menu', 'menuone', 'noselect' }
+
 require('packer').startup(function(use)
   -- Packer can manage itself
   use 'wbthomason/packer.nvim'
+
+  use 'onsails/diaglist.nvim'
+  use 'onsails/lspkind.nvim'
   use 'kaicataldo/material.vim'
   use 'ntpeters/vim-better-whitespace'
   use 'hashivim/vim-terraform'
@@ -982,17 +1011,26 @@ require('packer').startup(function(use)
   use 'neovim/nvim-lspconfig'
   use 'hrsh7th/cmp-nvim-lsp'
   use 'hrsh7th/cmp-buffer'
+  use 'hrsh7th/cmp-nvim-lua'
   use 'hrsh7th/cmp-path'
   use 'hrsh7th/cmp-cmdline'
   use 'hrsh7th/nvim-cmp'
   use 'doums/darcula'
 
   use 'golang/vscode-go'
-  --use 'hrsh7th/cmp-vsnip'
-  --use 'hrsh7th/vim-vsnip'
-  use 'L3MON4D3/LuaSnip'
-  use 'saadparwaiz1/cmp_luasnip'
+  use 'hrsh7th/cmp-vsnip'
+  use 'hrsh7th/vim-vsnip'
+  --use 'L3MON4D3/LuaSnip'
+  --use 'saadparwaiz1/cmp_luasnip'
+
+  -- Diagnostics
+  use { 'folke/trouble.nvim', requires = 'nvim-tree/nvim-web-devicons' }
 end)
+
+-- Require CiderLSP and Diagnostics modules
+-- IMPORTANT: Must come after plugins are loaded
+require 'lsp' -- CiderLSP
+require 'diagnostics' -- Diagnostics
 
 require('nvim-treesitter.configs').setup {
   ensure_installed = { 'lua', 'python', 'go' },
