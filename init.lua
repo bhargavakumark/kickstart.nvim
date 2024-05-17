@@ -1039,6 +1039,24 @@ require('nvim-treesitter.configs').setup {
   },
 }
 
+require('trouble').setup {
+  -- for full settings read https://github.com/folke/trouble.nvim?tab=readme-ov-file#setup
+  position = 'bottom', -- position of the list can be: bottom, top, left, right
+  severity = 'INFO', -- vim.diagnostic.severity.ERROR | WARN | INFO | HINT
+}
+
+-- Start bash-language-server for bash LSP, instructions from
+-- https://github.com/bash-lsp/bash-language-server?tab=readme-ov-file#neovim
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = 'sh',
+  callback = function()
+    vim.lsp.start {
+      name = 'bash-language-server',
+      cmd = { '/usr/local/google/home/bhargavakumark/.nvm/versions/node/v20.13.1/bin/bash-language-server', 'start' },
+    }
+  end,
+})
+
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
 vim.cmd [[
@@ -1064,17 +1082,6 @@ set nofoldenable        "dont fold by default
 set foldlevel=1         "this is just what i use
 
 set diffopt+=vertical   "start diff in vertical mode
-
-" both absolute and relative line numbers are enabled by default,
-" which produces “hybrid” line numbers. When entering insert mode,
-" relative line numbers are turned off, leaving absolute line numbers turned on.
-" This also happens when the buffer loses focus, so you can glance back at it
-" to see which absolute line you were working on if you need to.
-":augroup numbertoggle
-":  autocmd!
-":  autocmd BufEnter,FocusGained,InsertLeave,WinEnter * if &nu && mode() != "i" | set rnu   | endif
-":  autocmd BufLeave,FocusLost,InsertEnter,WinLeave   * if &nu                  | set nornu | endif
-":augroup END
 
 "Below for \t tab alignments
 ":set shiftwidth=8
@@ -1320,4 +1327,12 @@ endfunction
 au BufEnter /* call LoadCscope()
 
 set ic
+
+" Key bindings for trouble.nvim from https://github.com/folke/trouble.nvim?tab=readme-ov-file#commands
+nnoremap <leader>xx <cmd>TroubleToggle<cr>
+nnoremap <leader>xw <cmd>TroubleToggle workspace_diagnostics<cr>
+nnoremap <leader>xf <cmd>TroubleToggle document_diagnostics<cr>
+nnoremap <leader>xq <cmd>TroubleToggle quickfix<cr>
+nnoremap <leader>xl <cmd>TroubleToggle loclist<cr>
+nnoremap <leader>xr <cmd>TroubleToggle lsp_references<cr>
 ]]
