@@ -1,4 +1,5 @@
 --[[
+--
 
 =====================================================================
 ==================== READ THIS BEFORE CONTINUING ====================
@@ -926,6 +927,22 @@ require('lazy').setup({
     },
   },
   {
+    'mfussenegger/nvim-dap',
+    -- optional settings
+  },
+  {
+    'leoluz/nvim-dap-go',
+    -- optional settings
+  },
+  {
+    'rcarriga/nvim-dap-ui',
+    -- optional settings
+  },
+  {
+    'nvim-neotest/nvim-nio',
+    -- optional settings
+  },
+  {
     'onsails/diaglist.nvim',
     -- optional settings
     -- below are defaults
@@ -1025,6 +1042,13 @@ require('packer').startup(function(use)
 
   -- Diagnostics
   use { 'folke/trouble.nvim', requires = 'nvim-tree/nvim-web-devicons' }
+
+  -- Debugger
+  use 'folke/neodev.nvim'
+  use 'mfussenegger/nvim-dap'
+  use 'leoluz/nvim-dap-go'
+  use 'nvim-neotest/nvim-nio'
+  use { 'rcarriga/nvim-dap-ui', requires = { 'mfussenegger/nvim-dap', 'nvim-neotest/nvim-nio' } }
 end)
 
 -- Require CiderLSP and Diagnostics modules
@@ -1037,6 +1061,43 @@ require('nvim-treesitter.configs').setup {
   highlight = {
     enable = true,
   },
+}
+
+require('dap-go').setup {
+  -- Additional dap configurations can be added.
+  -- dap_configurations accepts a list of tables where each entry
+  -- represents a dap configuration. For more details do:
+  -- :help dap-configuration
+  dap_configurations = {
+    {
+      -- Must be "go" or it will be ignored by the plugin
+      type = 'go',
+      name = 'Attach remote',
+      mode = 'remote',
+      request = 'attach',
+    },
+  },
+}
+
+require('dapui').setup()
+
+-- This below is having issues when auto-opening and auto-closing
+-- local dap, dapui = require 'dap', require 'dapui'
+--dap.listeners.before.attach.dapui_config = function()
+--  dapui.open()
+--end
+--dap.listeners.before.launch.dapui_config = function()
+--  dapui.open()
+--end
+--dap.listeners.before.event_terminated.dapui_config = function()
+--  dapui.close()
+--end
+--dap.listeners.before.event_exited.dapui_config = function()
+--  dapui.close()
+--end
+
+require('neodev').setup {
+  library = { plugins = { 'nvim-dap-ui' }, types = true },
 }
 
 require('trouble').setup {
@@ -1056,6 +1117,51 @@ vim.api.nvim_create_autocmd('FileType', {
     }
   end,
 })
+
+-- Key bindings for dap debugger
+vim.keymap.set('n', '<F10>', function()
+  require('dap').step_over()
+end)
+vim.keymap.set('n', '<F11>', function()
+  require('dap').step_into()
+end)
+vim.keymap.set('n', '<F12>', function()
+  require('dap').step_out()
+end)
+
+vim.keymap.set('n', '<Leader>da', function()
+  require('dap').continue()
+end)
+vim.keymap.set('n', '<Leader>dc', function()
+  require('dap').continue()
+end)
+vim.keymap.set('n', '<Leader>db', function()
+  require('dap').toggle_breakpoint()
+end)
+vim.keymap.set('n', '<Leader>B', function()
+  require('dap').set_breakpoint()
+end)
+vim.keymap.set('n', '<Leader>dd', function()
+  require('dap').clear_breakpoints()
+end)
+vim.keymap.set('n', '<Leader>lp', function()
+  require('dap').set_breakpoint(nil, nil, vim.fn.input 'Log point message: ')
+end)
+vim.keymap.set('n', '<Leader>dr', function()
+  require('dap').repl.open()
+end)
+vim.keymap.set('n', '<Leader>dl', function()
+  require('dap').run_last()
+end)
+vim.keymap.set('n', '<Leader>do', function()
+  require('dapui').open()
+end)
+vim.keymap.set('n', '<Leader>duo', function()
+  require('dapui').open()
+end)
+vim.keymap.set('n', '<Leader>duc', function()
+  require('dapui').close()
+end)
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
@@ -1328,6 +1434,9 @@ au BufEnter /* call LoadCscope()
 
 set ic
 
+" autocomplete for attached debugger on go
+au FileType dap-repl lua require('dap.ext.autocompl').attach()
+
 " Key bindings for trouble.nvim from https://github.com/folke/trouble.nvim?tab=readme-ov-file#commands
 nnoremap <leader>xx <cmd>TroubleToggle<cr>
 nnoremap <leader>xw <cmd>TroubleToggle workspace_diagnostics<cr>
@@ -1335,4 +1444,5 @@ nnoremap <leader>xf <cmd>TroubleToggle document_diagnostics<cr>
 nnoremap <leader>xq <cmd>TroubleToggle quickfix<cr>
 nnoremap <leader>xl <cmd>TroubleToggle loclist<cr>
 nnoremap <leader>xr <cmd>TroubleToggle lsp_references<cr>
+
 ]]
