@@ -229,6 +229,14 @@ require('lazy').setup({
   -- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
   'tpope/vim-sleuth', -- Detect tabstop and shiftwidth automatically
 
+  --{
+  --  'ggml-org/llama.vim',
+  --},
+
+  {
+    'github/copilot.vim',
+  },
+
   -- NOTE: Plugins can also be added by using a table,
   -- with the first argument being the link and the following
   -- keys can be used to configure plugin behavior/loading/etc.
@@ -1171,7 +1179,7 @@ end)
 local cmp = require 'cmp'
 cmp.setup {
   mapping = cmp.mapping.preset.insert {
-    ['<CR>'] = cmp.mapping.confirm { select = true }, -- Confirm with Enter
+    ['<Tab>'] = cmp.mapping.confirm { select = true }, -- Confirm with Enter
   },
 }
 
