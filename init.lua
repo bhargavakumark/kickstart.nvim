@@ -414,6 +414,7 @@ require('lazy').setup({
     'williamboman/mason.nvim',
     opts = function(_, opts)
       opts.ensure_installed = opts.ensure_installed or {}
+      --vim.list_extend(opts.ensure_installed, { 'gofumpt', 'gomodifytags', 'impl', 'delve' })
       vim.list_extend(opts.ensure_installed, { 'goimports', 'gofumpt', 'gomodifytags', 'impl', 'delve' })
     end,
   },
@@ -1056,6 +1057,10 @@ end)
 require 'lsp' -- CiderLSP
 require 'diagnostics' -- Diagnostics
 
+-- Allows snippets to handle <Tab> for final jumps. from hrsh7th/.*vsnip
+vim.g.vsnip_append_final_tabstop = 1 -- Lua
+vim.g.vsnip_deactivate_on = 'InsertLeave'
+
 require('nvim-treesitter.configs').setup {
   ensure_installed = { 'lua', 'python', 'go' },
   highlight = {
@@ -1103,7 +1108,7 @@ require('neodev').setup {
 require('trouble').setup {
   -- for full settings read https://github.com/folke/trouble.nvim?tab=readme-ov-file#setup
   position = 'bottom', -- position of the list can be: bottom, top, left, right
-  severity = 'INFO', -- vim.diagnostic.severity.ERROR | WARN | INFO | HINT
+  severity = 'HINT', -- vim.diagnostic.severity.ERROR | WARN | INFO | HINT
 }
 
 -- Start bash-language-server for bash LSP, instructions from
@@ -1163,6 +1168,13 @@ vim.keymap.set('n', '<Leader>duc', function()
   require('dapui').close()
 end)
 
+local cmp = require 'cmp'
+cmp.setup {
+  mapping = cmp.mapping.preset.insert {
+    ['<CR>'] = cmp.mapping.confirm { select = true }, -- Confirm with Enter
+  },
+}
+
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
 vim.cmd [[
@@ -1198,7 +1210,7 @@ set diffopt+=vertical   "start diff in vertical mode
 if has("autocmd")
     " For java files use \t as separator
     autocmd BufRead,BufNewFile *.java :set shiftwidth=2 tabstop=2 softtabstop=2 shiftwidth=2 expandtab
-    autocmd BufRead,BufNewFile *.js :set shiftwidth=8 tabstop=8 softtabstop=8 shiftwidth=8 noexpandtab
+    autocmd BufRead,BufNewFile *.js :set shiftwidth=2 tabstop=2 softtabstop=2 shiftwidth=2 expandtab
     autocmd BufRead,BufNewFile *.cpp :set shiftwidth=4 tabstop=4 softtabstop=4 shiftwidth=4 expandtab
     "autocmd BufRead,BufNewFile *.cpp :set shiftwidth=2 tabstop=2 softtabstop=2 shiftwidth=2 expandtab
     "autocmd BufRead,BufNewFile *.sh :set shiftwidth=4 tabstop=4 softtabstop=4 shiftwidth=4 expandtab
@@ -1209,6 +1221,7 @@ if has("autocmd")
     autocmd BufRead,BufNewFile *.pl :set shiftwidth=8 tabstop=8 softtabstop=8 shiftwidth=8 noexpandtab
     autocmd BufRead,BufNewFile *.go :set shiftwidth=8 tabstop=8 softtabstop=8 shiftwidth=8 noexpandtab
     autocmd BufRead,BufNewFile *.yaml :set shiftwidth=2 tabstop=2 softtabstop=2 shiftwidth=2 expandtab
+    autocmd BufRead,BufNewFile *.md :set shiftwidth=2 tabstop=2 softtabstop=2 shiftwidth=2 expandtab
 endif
 
 " pathogen
@@ -1309,6 +1322,12 @@ autocmd BufWinLeave * call clearmatches()
 :iabbrev strint string
 :iabbrev ERORR ERROR
 :iabbrev instnace instance
+:iabbrev clsuter cluster
+:iabbrev mulitple multiple
+:iabbrev availablity availability
+:iabbrev depedencies dependencies
+:iabbrev depedency dependency
+:iabbrev enviormnent environment
 
 " set NERDTreeWinPos="right"		" Doesn't work anymore
 
@@ -1321,10 +1340,6 @@ autocmd BufWinLeave * call clearmatches()
 
 "autocmd VimEnter * wincmd p
 ":NERDTreeToggle
-
-:set wildmode=list:longest
-:set winheight=9999
-:set so=5
 
 nnoremap <leader>n :NERDTreeFocus<CR>
 "nnoremap <C-n> :NERDTree<CR>
@@ -1445,4 +1460,24 @@ nnoremap <leader>xq <cmd>TroubleToggle quickfix<cr>
 nnoremap <leader>xl <cmd>TroubleToggle loclist<cr>
 nnoremap <leader>xr <cmd>TroubleToggle lsp_references<cr>
 
+" vim cycle tabs with gt
+nnoremap gt :tabnext<CR>
+
+
+" Settings from https://groups.google.com/a/google.com/g/vi-users/c/jyVNZjO7Eps/m/Vwn-aqYkBQAJ
+"
+" Not using settings for go as its already being formatted correctly
+augroup autoformat_settings
+  autocmd FileType bzl AutoFormatBuffer buildifier
+"  autocmd FileType go AutoFormatBuffer gofmt
+"  See go/vim/plugins/codefmt-google, :help codefmt-google and :help codefmt
+"  for details about other available formatters.
+augroup END
+
+" Tab completion
+set wildmode=longest,list,full
+set wildmenu
+set wildmode=list:longest
+set winheight=9999
+set so=5
 ]]
