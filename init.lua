@@ -1060,11 +1060,6 @@ require('packer').startup(function(use)
   use { 'rcarriga/nvim-dap-ui', requires = { 'mfussenegger/nvim-dap', 'nvim-neotest/nvim-nio' } }
 end)
 
--- Require CiderLSP and Diagnostics modules
--- IMPORTANT: Must come after plugins are loaded
-require 'lsp' -- CiderLSP
-require 'diagnostics' -- Diagnostics
-
 -- Allows snippets to handle <Tab> for final jumps. from hrsh7th/.*vsnip
 vim.g.vsnip_append_final_tabstop = 1 -- Lua
 vim.g.vsnip_deactivate_on = 'InsertLeave'
@@ -1496,17 +1491,22 @@ set so=5
 local function disable_copilot_by_path()
   local current_file = vim.fn.expand '%:p' -- Get full path of current file
 
-  -- List of paths/patterns where Copilot should be disabled
-  local disabled_paths = {
-    '/google/src/cloud/',
-  }
-
-  -- Check if current file matches any disabled path pattern
-  for _, path_pattern in ipairs(disabled_paths) do
-    if string.find(current_file, path_pattern) then
-      vim.cmd 'Copilot disable'
-      return -- Exit after first match
-    end
+  --  -- List of paths/patterns where Copilot should be disabled
+  --  local disabled_paths = {
+  --    '/google/src/cloud/',
+  --  }
+  --
+  --  -- Check if current file matches any disabled path pattern
+  --  for _, path_pattern in ipairs(disabled_paths) do
+  --    if string.find(current_file, path_pattern) then
+  --      vim.cmd 'Copilot disable'
+  --      return -- Exit after first match
+  --    end
+  --  end
+  if current_file:match '/google/src/cloud/' then
+    require 'lsp' -- CiderLSP
+    require 'diagnostics' -- Diagnostics
+    vim.cmd 'Copilot disable'
   end
 end
 
