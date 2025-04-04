@@ -1489,3 +1489,35 @@ set wildmode=list:longest
 set winheight=9999
 set so=5
 ]]
+
+--
+-- Disable Copilot for specific file types or paths
+--
+local function disable_copilot_by_path()
+  local current_file = vim.fn.expand '%:p' -- Get full path of current file
+
+  -- List of paths/patterns where Copilot should be disabled
+  local disabled_paths = {
+    '/google/src/cloud/',
+  }
+
+  -- Check if current file matches any disabled path pattern
+  for _, path_pattern in ipairs(disabled_paths) do
+    if string.find(current_file, path_pattern) then
+      vim.cmd 'Copilot disable'
+      return -- Exit after first match
+    end
+  end
+end
+
+-- Set up autocmd to run when opening files
+vim.api.nvim_create_autocmd({ 'BufEnter', 'BufRead' }, {
+  pattern = '*',
+  callback = disable_copilot_by_path,
+})
+
+-- Optional: Also run when creating new files
+vim.api.nvim_create_autocmd('BufNewFile', {
+  pattern = '*',
+  callback = disable_copilot_by_path,
+})
