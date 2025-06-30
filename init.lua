@@ -1436,19 +1436,19 @@ set tags+=~/.vim/tags/cpp_src
 "endif
 
 " https://vim.fandom.com/wiki/Autoloading_Cscope_Database
-function! LoadCscope()
-  let db = findfile("cscope.out", ".;")
-  if (!empty(db))
-    let path = strpart(db, 0, match(db, "/cscope.out$"))
-    set nocscopeverbose " suppress 'duplicate connection' error
-    exe "cs add " . db . " " . path
-    set cscopeverbose
-  " else add the database pointed to by environment variable 
-  elseif $CSCOPE_DB != "" 
-    cs add $CSCOPE_DB
-  endif
-endfunction
-au BufEnter /* call LoadCscope()
+"function! LoadCscope()
+"  let db = findfile("cscope.out", ".;")
+"  if (!empty(db))
+"    let path = strpart(db, 0, match(db, "/cscope.out$"))
+"    set nocscopeverbose " suppress 'duplicate connection' error
+"    exe "cs add " . db . " " . path
+"    set cscopeverbose
+"  " else add the database pointed to by environment variable 
+"  elseif $CSCOPE_DB != "" 
+"    cs add $CSCOPE_DB
+"  endif
+"endfunction
+"au BufEnter /* call LoadCscope()
 
 set ic
 
@@ -1504,6 +1504,7 @@ local function disable_copilot_by_path()
   --    end
   --  end
   if current_file:match '/google/src/cloud/' then
+    vim.opt.completeopt = { 'menu', 'menuone', 'noselect' }
     require 'lsp' -- CiderLSP
     require 'diagnostics' -- Diagnostics
     vim.cmd 'Copilot disable'
@@ -1520,4 +1521,43 @@ vim.api.nvim_create_autocmd({ 'BufEnter', 'BufRead' }, {
 vim.api.nvim_create_autocmd('BufNewFile', {
   pattern = '*',
   callback = disable_copilot_by_path,
+})
+
+vim.api.nvim_create_autocmd('BufNewFile', {
+  pattern = '*.sh',
+  callback = function()
+    vim.fn.system { 'chmod', '+x', vim.fn.expand '%:p' }
+    local filepath = vim.fn.expand '%:p'
+    if vim.fn.filereadable(filepath) == 1 then
+      vim.fn.system { 'chmod', '+x', filepath }
+    end
+    local lines = {
+      '#!/bin/bash',
+      '',
+      'RED="\\e[0;31m"',
+      'GREEN="\\e[0;32m"',
+      'YELLOW="\\e[0;33m"',
+      'BLUE="\\e[0;34m"',
+      'NC="\\e[0m" # No Color',
+      '',
+      'function ECHO_RED() {',
+      '  echo -e "${RED}$1${NC}"',
+      '}',
+      'function ECHO_GREEN() {',
+      '  echo -e "${GREEN}$1${NC}"',
+      '}',
+      'function ECHO_YELLOW() {',
+      '  echo -e "${YELLOW}$1${NC}"',
+      '}',
+      'function ECHO_BLUE() {',
+      '  echo -e "${BLUE}$1${NC}"',
+      '}',
+      'function ECHO_NC() {',
+      '  echo -e "${NC}$1${NC}"',
+      '}',
+      '',
+    }
+    vim.api.nvim_buf_set_lines(0, 0, -1, false, lines)
+    vim.cmd 'normal G' -- Move cursor to end
+  end,
 })
