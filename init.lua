@@ -565,7 +565,6 @@ require('lazy').setup({
           end
         end,
       })
-
       -- LSP servers and clients are able to communicate to each other what features they support.
       --  By default, Neovim doesn't support everything that is in the LSP specification.
       --  When you add nvim-cmp, luasnip, etc. Neovim now has *more* capabilities.
@@ -583,7 +582,33 @@ require('lazy').setup({
       --  - settings (table): Override the default settings passed when initializing the server.
       --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
       local servers = {
-        clangd = {},
+        clangd = {
+          cmd = { 'clangd', '--background-index', '-log=verbose' }, -- Use clangd with background indexing
+          filetypes = { 'c', 'cpp', 'objc', 'objcpp' }, -- Override default filetypes
+          capabilities = vim.tbl_deep_extend('force', capabilities, {
+            offsetEncoding = { 'utf-8', 'utf-16' }, -- clangd supports utf-16 offsets
+          }),
+          settings = {
+            clangd = {
+              fallbackFlags = { '-std=c++17' }, -- Use C++20 by default
+              semanticHighlighting = true, -- Enable semantic highlighting
+            },
+          },
+          -- Attach callback for keymaps and autocmds
+          --          on_attach = function(client, bufnr)
+          --            -- Enable default formatting if the client supports it
+          --            if client.server_capabilities.documentFormattingProvider then
+          --              -- Auto-format on save (optional, but highly recommended)
+          --              vim.api.nvim_create_autocmd('BufWritePre', {
+          --                group = vim.api.nvim_create_augroup('LspFormatting', {}),
+          --                buffer = bufnr,
+          --                callback = function()
+          --                  vim.lsp.buf.format { bufnr = bufnr }
+          --                end,
+          --              })
+          --            end
+          --          end,
+        },
         gopls = {
           keys = {
             -- Workaround for the lack of a DAP strategy in neotest-go: https://github.com/nvim-neotest/neotest-go/issues/12
@@ -1126,6 +1151,13 @@ vim.api.nvim_create_autocmd('FileType', {
   end,
 })
 
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = 'cpp',
+  callback = function()
+    vim.b.autoformat = false
+  end,
+})
+
 -- Key bindings for dap debugger
 vim.keymap.set('n', '<F10>', function()
   require('dap').step_over()
@@ -1225,6 +1257,7 @@ if has("autocmd")
     autocmd BufRead,BufNewFile *.go :set shiftwidth=8 tabstop=8 softtabstop=8 shiftwidth=8 noexpandtab
     autocmd BufRead,BufNewFile *.yaml :set shiftwidth=2 tabstop=2 softtabstop=2 shiftwidth=2 expandtab
     autocmd BufRead,BufNewFile *.md :set shiftwidth=2 tabstop=2 softtabstop=2 shiftwidth=2 expandtab
+    autocmd BufRead,BufNewFile *.json :set shiftwidth=2 tabstop=2 softtabstop=2 shiftwidth=2 expandtab
 endif
 
 " pathogen
@@ -1471,7 +1504,7 @@ nnoremap gt :tabnext<CR>
 "
 " Not using settings for go as its already being formatted correctly
 augroup autoformat_settings
-  autocmd FileType bzl AutoFormatBuffer buildifier
+"  autocmd FileType bzl AutoFormatBuffer buildifier
 "  autocmd FileType go AutoFormatBuffer gofmt
 "  See go/vim/plugins/codefmt-google, :help codefmt-google and :help codefmt
 "  for details about other available formatters.
@@ -1503,10 +1536,20 @@ local function disable_copilot_by_path()
   --      return -- Exit after first match
   --    end
   --  end
+  -- vim.cmd 'Copilot disable'
   if current_file:match '/google/src/cloud/' then
     vim.opt.completeopt = { 'menu', 'menuone', 'noselect' }
     require 'lsp' -- CiderLSP
     require 'diagnostics' -- Diagnostics
+    vim.cmd 'Copilot disable'
+  end
+  if current_file:match '/usr/local/google/home/bhargavakumark/git' then
+    vim.opt.completeopt = { 'menu', 'menuone', 'noselect' }
+    require 'lsp' -- CiderLSP
+    require 'diagnostics' -- Diagnostics
+    vim.cmd 'Copilot enable'
+  end
+  if current_file:match '/usr/local/google/home/bhargavakumark/issues' then
     vim.cmd 'Copilot disable'
   end
 end
