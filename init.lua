@@ -353,7 +353,7 @@ vim.api.nvim_create_autocmd('FileType', {
   callback = function()
     vim.lsp.start {
       name = 'bash-language-server',
-      cmd = { '/usr/local/google/home/bhargavakumark/.nvm/versions/node/v20.13.1/bin/bash-language-server', 'start' },
+      cmd = { '/Users/bkancherla/.nvm/versions/node/v24.11.0/bin/bash-language-server', 'start' },
     }
   end,
 })
@@ -694,19 +694,10 @@ local function disable_copilot_by_path()
   --    end
   --  end
   -- vim.cmd 'Copilot disable'
-  if current_file:match '/google/src/cloud/' then
+  if current_file:match '/Users/bkancherla/git/' then
     vim.opt.completeopt = { 'menu', 'menuone', 'noselect' }
-    require 'lsp' -- CiderLSP
-    require 'diagnostics' -- Diagnostics
-    vim.cmd 'Copilot disable'
-  end
-  if current_file:match '/usr/local/google/home/bhargavakumark/git' then
-    vim.opt.completeopt = { 'menu', 'menuone', 'noselect' }
-    require 'lsp' -- CiderLSP
-    require 'diagnostics' -- Diagnostics
-    vim.cmd 'Copilot enable'
-  end
-  if current_file:match '/usr/local/google/home/bhargavakumark/issues' then
+    -- require 'lsp' -- CiderLSP
+    -- require 'diagnostics' -- Diagnostics
     vim.cmd 'Copilot disable'
   end
 end
