@@ -249,8 +249,6 @@ require('lazy').setup({
   -- "gc" to comment visual regions/lines
   { 'numToStr/Comment.nvim', opts = {} },
 
--- Start bash-language-server for bash LSP, instructions from
--- https://github.com/bash-lsp/bash-language-server?tab=readme-ov-file#neovim
   {
     'xiantang/darcula-dark.nvim', -- Use the correct repo name here
     dependencies = {
@@ -335,19 +333,128 @@ require('lazy').setup({
   {
     'doums/darcula',
   },
+
+  -- Core LSP/Mason Plugins
+  { "neovim/nvim-lspconfig" },
+  { "williamboman/mason.nvim", cmd = "Mason" },
+  { "williamboman/mason-lspconfig.nvim" },
+  { "mfussenegger/nvim-jdtls" },
+
+  -- Autocompletion
+  { "hrsh7th/nvim-cmp" },
+  { "hrsh7th/cmp-nvim-lsp" },
+  {'L3MON4D3/LuaSnip'},
 })
+
+-- Based on https://github.com/mfussenegger/nvim-jdtls?tab=readme-ov-file
+vim.lsp.config("jdtls", {
+  settings = {
+    java = {
+        -- Custom eclipse.jdt.ls options go here
+    },
+  },
+})
+vim.lsp.enable("jdtls")
+
+-- lua LSP config
+vim.lsp.config('luals', {
+  cmd = {'lua-language-server'},
+  filetypes = {'lua'},
+  root_markers = {'.luarc.json', '.luarc.jsonc'},
+})
+vim.lsp.enable('luals')
+
+-- go LSP config
+vim.lsp.config('gopls', {
+  cmd = {'gopls'},
+  filetypes = {'go', 'gomod', 'gowork', 'gosum'},
+  root_markers = {'go.mod', '.git'},
+})
+
+
+-- ========================================================
+-- LSP Configuration (Addressing Deprecation Warning)
+-- ========================================================
+
+--
+-- -- Define constants (assumes default Mason paths)
+-- local MASON_PATH = vim.fn.expand('~/.local/share/nvim/mason')
+-- local JDTLS_PATH = MASON_PATH .. '/packages/jdtls'
+-- local JDEBUG_PATH = MASON_PATH .. '/packages/java-debug-adapter'
+-- local util = require('lspconfig.util')
+--
+-- -- Function to generate the full JDTLS config table
+-- local jdtls_config = function()
+--     local root_dir = util.root_pattern('pom.xml', 'build.gradle', '.git')()
+--
+--     -- Ensure the workspace directory is unique per project and outside the project root
+--     local workspace_folder = MASON_PATH .. '/jdtls_workspaces/' .. vim.fn.fnamemodify(root_dir, ':p:h:t')
+--
+--     -- Gather Java Debug Adapter JARs (required)
+--     local bundles = {}
+--     vim.list_extend(bundles, vim.split(vim.fn.glob(JDEBUG_PATH .. '/extension/server/*.jar'), '\n'))
+--     vim.list_extend(bundles, vim.split(vim.fn.glob(JDEBUG_PATH .. '/extension/server/lib/*.jar'), '\n'))
+--
+--     local cmd = {
+--         'java',
+--         '-Declipse.application=org.eclipse.jdt.ls.core.id1',
+--         '-Dosgi.bundles.defaultStartLevel=4',
+--         '-Declipse.product=org.eclipse.jdt.ls.core.product',
+--         '-Dlog.protocol=true',
+--         '-Dlog.level=ALL',
+--         '-Xmx1G', -- Adjust memory limit as needed
+--         '--add-modules=ALL-SYSTEM',
+--         '--add-opens', 'java.base/java.util=ALL-UNNAMED',
+--         '--add-opens', 'java.base/java.lang=ALL-UNNAMED',
+--         '-jar', vim.fn.glob(JDTLS_PATH .. '/plugins/org.eclipse.equinox.launcher_*.jar'),
+--         '-configuration', JDTLS_PATH .. '/config_mac', -- <<< CHECK/CHANGE THIS: Use config_linux for Linux
+--         '-data', workspace_folder
+--     }
+--
+--     -- Final configuration table
+--     return {
+--         cmd = cmd,
+--         root_dir = root_dir,
+--         -- You can define shared on_attach functions here
+--         on_attach = function(client, bufnr)
+--             vim.notify("LSP attached to JDTLS!", vim.log.levels.INFO)
+--         end,
+--         settings = {
+--             java = {
+--                 content = { version = 17 }, -- Specify target JDK version
+--             },
+--         },
+--     }
+-- end
+--
+-- -- Setup Mason and Mason-LSPConfig
+-- require('mason').setup()
+--
+-- -- Use the modern method: Setup handlers for specific servers via mason-lspconfig.
+-- -- This guarantees the setup is called correctly after the server is installed.
+-- require('mason-lspconfig').setup {
+--     -- Use an empty setup table for all other servers (e.g., bashls, pyright)
+--     ensure_installed = {},
+--     handlers = {
+--         -- The JDTLS configuration must be defined here, as a function:
+--         ["jdtls"] = function()
+--             -- We call the native setup method but pass our full custom config
+--             require('lspconfig').jdtls.setup(jdtls_config())
+--         end,
+--
+--         -- Default handler for all other Mason-installed servers:
+--         ["_"] = function(server_name)
+--             require('lspconfig')[server_name].setup({})
+--         end,
+--     },
+-- }
 
 -- Allows snippets to handle <Tab> for final jumps. from hrsh7th/.*vsnip
 vim.g.vsnip_append_final_tabstop = 1 -- Lua
 vim.g.vsnip_deactivate_on = 'InsertLeave'
 
-require('nvim-treesitter.configs').setup {
-  ensure_installed = { 'lua', 'python', 'go' },
-  highlight = {
-    enable = true,
-  },
-}
-
+-- Start bash-language-server for bash LSP, instructions from
+-- https://github.com/bash-lsp/bash-language-server?tab=readme-ov-file#neovim
 vim.api.nvim_create_autocmd('FileType', {
   pattern = 'sh',
   callback = function()
@@ -633,8 +740,8 @@ set tags+=~/.vim/tags/cpp_src
 "    set nocscopeverbose " suppress 'duplicate connection' error
 "    exe "cs add " . db . " " . path
 "    set cscopeverbose
-"  " else add the database pointed to by environment variable 
-"  elseif $CSCOPE_DB != "" 
+"  " else add the database pointed to by environment variable
+"  elseif $CSCOPE_DB != ""
 "    cs add $CSCOPE_DB
 "  endif
 "endfunction
