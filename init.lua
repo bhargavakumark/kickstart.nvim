@@ -85,6 +85,13 @@ I hope you enjoy your Neovim journey,
 P.S. You can delete this when you're done too. It's your config now! :)
 --]]
 
+-- Disables the built-in file explorer (netrw) which conflicts with nvim-tree
+vim.g.loaded_netrw = 1
+vim.g.loaded_netrwPlugin = 1
+
+-- Optional, but highly recommended for icons (requires a patched font like Nerd Font)
+vim.opt.termguicolors = true
+
 -- Set <space> as the leader key
 -- See `:help mapleader`
 --  NOTE: Must happen before plugins are loaded (otherwise wrong leader will be used)
@@ -345,6 +352,23 @@ require('lazy').setup({
   { "hrsh7th/cmp-nvim-lsp" },
   {'L3MON4D3/LuaSnip'},
 
+  -- nvim-tree that shows files list in the left pane
+  {
+    'nvim-tree/nvim-tree.lua',
+    dependencies = {
+      -- Required for file icons (need a Nerd Font installed)
+      'nvim-tree/nvim-web-devicons',
+    },
+    config = function()
+      -- The setup function is called here (see snippet 3)
+      require('nvim-tree').setup()
+    end,
+    -- Define a keymap to toggle it easily
+    keys = {
+      { '<leader>e', ':NvimTreeToggle<CR>', desc = 'Toggle File Explorer' }
+    }
+  },
+
   { -- Fuzzy Finder (files, lsp, etc)
     'nvim-telescope/telescope.nvim',
     event = 'VimEnter',
@@ -496,6 +520,56 @@ require('lazy').setup({
   },
 
 })
+
+require("nvim-tree").setup({
+    -- Control how the tree view itself behaves
+    view = {
+        -- Set the initial width of the tree window
+        width = 30,
+        -- Set the sidebar position
+        side = 'left',
+    },
+    -- Control how file names and icons are displayed
+    renderer = {
+        -- Group empty folders together for a cleaner look
+        group_empty = true,
+    },
+    -- Filter out files/folders you don't want to see
+    filters = {
+        -- Hide common OS/Git temporary/config files
+        dotfiles = false, -- Set to true to hide files starting with '.'
+        custom = { 'node_modules', '.git', 'vendor' },
+    },
+    -- Enable diagnostics (LSP errors/warnings) to be shown in the tree
+    diagnostics = {
+        enable = true,
+        show_on_dirs = true,
+    },
+    -- Optional: Automatically close nvim-tree when the last buffer is closed
+    on_attach = function(bufnr)
+        local api = require('nvim-tree.api')
+
+        local function opts(desc)
+          return { desc = 'nvim-tree: ' .. desc, buffer = bufnr, noremap = true, silent = true, nowait = true }
+        end
+
+        -- === Standard/Default Maps ===
+        -- These are the maps that likely aren't working for you:
+        vim.keymap.set('n', 'o', api.node.open.tab, opts('Open/Expand'))
+        vim.keymap.set('n', '<CR>', api.node.open.tab, opts('Open/Expand'))
+        vim.keymap.set('n', 'v', api.node.open.vertical, opts('Open Vertical Split'))
+        vim.keymap.set('n', 's', api.node.open.horizontal, opts('Open Horizontal Split'))
+        vim.keymap.set('n', 't', api.node.open.tab, opts('Open in New Tab'))
+
+        -- Other useful maps you might want:
+        vim.keymap.set('n', 'q', api.tree.close, opts('Close'))
+        -- vim.keymap.set('n', 'r', api.tree.reload_all, opts('Refresh'))
+        vim.keymap.set('n', 'R', api.tree.change_root_to_parent, opts('Parent Dir'))
+    end,
+})
+
+-- Command to open/close the tree (can be mapped to a key)
+vim.api.nvim_create_user_command('T', 'NvimTreeToggle', {})
 
 -- Based on https://github.com/mfussenegger/nvim-jdtls?tab=readme-ov-file
 vim.lsp.config("jdtls", {
