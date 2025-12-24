@@ -118,11 +118,6 @@ vim.opt.mouse = 'a'
 -- Don't show the mode, since it's already in the status line
 vim.opt.showmode = false
 
--- Sync clipboard between OS and Neovim.
---  Remove this option if you want your OS clipboard to remain independent.
---  See `:help 'clipboard'`
-vim.opt.clipboard = 'unnamedplus'
-
 -- Enable break indent
 vim.opt.breakindent = true
 
@@ -1123,3 +1118,30 @@ vim.api.nvim_create_user_command(
   end,
   { nargs = '?' } -- Allows 0 or 1 argument
 )
+
+-- In ~/.config/nvim/init.lua
+
+-- Sync clipboard between OS and Neovim.
+--  Remove this option if you want your OS clipboard to remain independent.
+--  See `:help 'clipboard'`
+-- vim.opt.clipboard = 'unnamedplus'
+
+-- Set the clipboard option to an empty string.
+-- This DISABLES automatic synchronization between Vim's unnamed register ("")
+-- and the system clipboard (+) or primary selection (*).
+vim.opt.clipboard = ''
+-- Now:
+-- Deletions (dw, dd, etc.) go to the internal unnamed register (""). P pastes it.
+-- Cmd+V (System paste) pastes what was last explicitly copied with Cmd+C.
+-- To yank to the system clipboard, you must explicitly use: "+y
+-- To paste from the system clipboard, you must explicitly use: "+p
+
+-- Key mapping to open file under cursor in a new tab
+vim.api.nvim_set_keymap('n', 'gf', '<C-W>gf', { noremap = true, silent = true })
+
+-- Show diagnostic popup on cursor hover
+vim.api.nvim_create_autocmd("CursorHold", {
+  callback = function()
+    vim.diagnostic.open_float(nil, { focusable = false })
+  end,
+})
