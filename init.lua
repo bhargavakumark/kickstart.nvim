@@ -85,6 +85,14 @@ I hope you enjoy your Neovim journey,
 P.S. You can delete this when you're done too. It's your config now! :)
 --]]
 
+-- NOTE: Some shortcuts using Command+key (on Mac) require allowing the character
+-- through iterm settings. For any shortcuts that use Command, make sure to create
+-- mapping in iterm2 Preferences > Profiles > Keys > Key Bindings > +
+-- Keyboard Shortcut: Press ⌘B <or whatever key you want>
+-- Action: Send Escape Sequence
+-- Esc+: (this will send <Esc> followed by :)
+-- This allows you to use Command+key combinations to map to 'Esc' key shortcuts
+
 -- Disables the built-in file explorer (netrw) which conflicts with nvim-tree
 vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
@@ -360,7 +368,9 @@ require('lazy').setup({
     end,
     -- Define a keymap to toggle it easily
     keys = {
-      { '<leader>e', ':NvimTreeToggle<CR>', desc = 'Toggle File Explorer' }
+      { '<leader>e', ':NvimTreeToggle<CR>', desc = 'Toggle File Explorer' },
+      -- Esc is configured in iterm2 to be passed when pressing cmd+b
+      { '<Esc>b', ':NvimTreeToggle<CR>', desc = 'Toggle File Explorer' }
     }
   },
 
@@ -481,6 +491,7 @@ require('lazy').setup({
       vim.keymap.set('n', '<leader>sh', builtin.help_tags, { desc = '[S]earch [H]elp' })
       vim.keymap.set('n', '<leader>sk', builtin.keymaps, { desc = '[S]earch [K]eymaps' })
       vim.keymap.set('n', '<leader>sf', builtin.find_files, { desc = '[S]earch [F]iles' })
+      vim.keymap.set('n', '<Esc>p', builtin.find_files, { desc = '[S]earch [F]iles' })
       vim.keymap.set('n', '<leader>ss', builtin.builtin, { desc = '[S]earch [S]elect Telescope' })
       vim.keymap.set('n', '<leader>sw', builtin.grep_string, { desc = '[S]earch current [W]ord' })
       vim.keymap.set('n', '<leader>sg', builtin.live_grep, { desc = '[S]earch by [G]rep' })
@@ -567,10 +578,38 @@ require("nvim-tree").setup({
 vim.api.nvim_create_user_command('T', 'NvimTreeToggle', {})
 
 -- Based on https://github.com/mfussenegger/nvim-jdtls?tab=readme-ov-file
+local home = os.getenv("HOME")
+local jdtls_path = home .. "/jdt-language-server"
+
+-- 1. Dynamically find the launcher jar
+local launcher_jar = vim.fn.glob(jdtls_path .. "/plugins/org.eclipse.equinox.launcher_*.jar")
+
+-- 2. Setup a unique workspace directory per project
+local project_name = vim.fn.fnamemodify(vim.fn.getcwd(), ":p:h:t")
+local workspace_dir = home .. "/.cache/jdtls/workspace/" .. project_name
 vim.lsp.config("jdtls", {
+  cmd = {
+    "java",
+    "-Declipse.application=org.eclipse.jdt.ls.core.id1",
+    "-Dosgi.bundles.defaultStartLevel=4",
+    "-Declipse.product=org.eclipse.jdt.ls.core.product",
+    "-Dlog.protocol=true",
+    "-Dlog.level=ALL",
+    "-Xmx1g",
+    "--add-modules=ALL-SYSTEM",
+    "--add-opens", "java.base/java.util=ALL-UNNAMED",
+    "--add-opens", "java.base/java.lang=ALL-UNNAMED",
+
+    "-jar", launcher_jar,
+    "-configuration", jdtls_path .. "/config_mac",
+    "-data", workspace_dir,
+  },
+  root_dir = vim.fs.root(0, { ".git", "mvnw", "gradlew", "pom.xml" }),
   settings = {
     java = {
-        -- Custom eclipse.jdt.ls options go here
+      -- Custom eclipse.jdt.ls options go here
+      signatureHelp = { enabled = true },
+      contentProvider = { preferred = 'fernflower' },
     },
   },
 })
