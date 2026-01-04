@@ -364,7 +364,38 @@ require('lazy').setup({
     },
     config = function()
       -- The setup function is called here (see snippet 3)
-      require('nvim-tree').setup()
+      -- Global setup first
+      require("nvim-tree").setup {
+        view = { width = 35, side = "left" },
+        renderer = { indent_markers = { enable = true } },
+        update_focused_file = { enable = true },
+        filters = { dotfiles = false },
+        actions = {
+          open_file = {
+            quit_on_open = false,  -- Keep tree open
+          },
+        },
+      }
+
+      -- Auto-open on VimEnter, focus editor (wincmd p equivalent)
+      vim.api.nvim_create_autocmd("VimEnter", {
+        callback = function()
+          vim.defer_fn(function()
+            require("nvim-tree.api").tree.toggle({ focus = false, find_file = true })
+            vim.cmd("wincmd p")  -- Switch to previous/editor window
+          end, 10)
+        end,
+      })
+
+      -- Close if only tree left (optional)
+      vim.api.nvim_create_autocmd({ "BufEnter", "BufWinEnter" }, {
+        callback = function()
+          local filetype = vim.bo.filetype
+          if filetype == "NvimTree" and #vim.api.nvim_list_wins() == 1 then
+            vim.cmd("quit")
+          end
+        end,
+      })
     end,
     -- Define a keymap to toggle it easily
     keys = {
@@ -524,6 +555,47 @@ require('lazy').setup({
       end, { desc = '[S]earch [N]eovim files' })
     end,
   },
+
+  -- Avante.nvim spec
+  {
+    "yetone/avante.nvim",
+    event = "VeryLazy",
+    lazy = false,
+    version = false,  -- Latest
+    opts = {
+      provider = "claude",  -- Change to "openrouter" if preferred
+      mappings = {
+        ask = "<leader>aa",
+        edit = "<leader>ae",
+        refresh = "<leader>ar",
+      },
+      behaviour = {
+        auto_suggestions = false,
+        auto_set_highlight_group = true,
+        auto_apply_diff_after_generation = false,
+      },
+      claude = {
+        model = "claude-3-5-sonnet-20241022",
+        timeout = 30000,
+        temperature = 0,
+        max_tokens = 4096,
+      },
+      -- OpenRouter example (uncomment if using)
+      -- openrouter = {
+      --   endpoint = "https://openrouter.ai/api/v1",
+      --   model = "anthropic/claude-3-5-sonnet",
+      -- },
+    },
+    build = "make",
+    dependencies = {
+      "nvim-treesitter/nvim-treesitter",
+      "nvim-tree/nvim-web-devicons",
+      "stevearc/dressing.nvim",
+      "nvim-lua/plenary.nvim",
+      "MunifTanjim/nui.nvim",
+    },
+  },
+
 
 })
 
@@ -888,22 +960,12 @@ autocmd BufWinLeave * call clearmatches()
 :iabbrev depedency dependency
 :iabbrev enviormnent environment
 
-" set NERDTreeWinPos="right"		" Doesn't work anymore
-
-" Sometimes when vim loads, there are errors, these errors don't show up
-" if nerdtree is enabled. Disable NERDTree and start again to see errors
-" Start NERDTree
-"autocmd VimEnter * NERDTree
-" Start NERDTree and put the cursor back in the other window.
-"autocmd VimEnter * wincmd p
-
 "autocmd VimEnter * wincmd p
 ":NERDTreeToggle
 
 nnoremap <leader>n :NERDTreeFocus<CR>
 "nnoremap <C-n> :NERDTree<CR>
 "nnoremap <C-t> :NERDTreeToggle<CR>
-:nmap <F4> :NERDTreeToggle<CR>
 "nnoremap <C-f> :NERDTreeFind<CR>
 
 " Close the tab if NERDTree is the only window remaining in it.
