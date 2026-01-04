@@ -107,7 +107,7 @@ vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
 -- Set to true if you have a Nerd Font installed and selected in the terminal
-vim.g.have_nerd_font = false
+vim.g.have_nerd_font = true
 
 -- [[ Setting options ]]
 -- See `:help vim.opt`
@@ -244,6 +244,20 @@ require('lazy').setup({
   --},
 
   {
+    "nvim-tree/nvim-web-devicons",
+    lazy = false,  -- Eager load for avante
+    priority = 1000,
+    enabled = true,  -- Override any cond
+    config = function()
+      require("nvim-web-devicons").setup {
+        -- optional: override default colors
+        override = {
+          ["lua"] = { icon = "", color = "#51a0cf" },
+        },
+      }
+    end,
+  },
+  {
     'github/copilot.vim',
   },
 
@@ -378,14 +392,14 @@ require('lazy').setup({
       }
 
       -- Auto-open on VimEnter, focus editor (wincmd p equivalent)
-      vim.api.nvim_create_autocmd("VimEnter", {
-        callback = function()
-          vim.defer_fn(function()
-            require("nvim-tree.api").tree.toggle({ focus = false, find_file = true })
-            vim.cmd("wincmd p")  -- Switch to previous/editor window
-          end, 10)
-        end,
-      })
+      -- vim.api.nvim_create_autocmd("VimEnter", {
+      --   callback = function()
+      --     vim.defer_fn(function()
+      --       require("nvim-tree.api").tree.toggle({ focus = false, find_file = true })
+      --       vim.cmd("wincmd p")  -- Switch to previous/editor window
+      --     end, 10)
+      --   end,
+      -- })
 
       -- Close if only tree left (optional)
       vim.api.nvim_create_autocmd({ "BufEnter", "BufWinEnter" }, {
@@ -556,35 +570,48 @@ require('lazy').setup({
     end,
   },
 
-  -- Avante.nvim spec
   {
     "yetone/avante.nvim",
     event = "VeryLazy",
     lazy = false,
-    version = false,  -- Latest
+    version = false,
     opts = {
-      provider = "claude",  -- Change to "openrouter" if preferred
+      windows = {
+        icons = {
+          enabled = true,
+        },
+      },
+      provider = "openrouter",
       mappings = {
-        ask = "<leader>aa",
-        edit = "<leader>ae",
-        refresh = "<leader>ar",
+        ask = "<Esc>l",
+        edit = "<Esc>i",
+        refresh = "<Esc>r",
+        switch_provider = "<leader>kS",
+        toggle_use_token_file = "<leader>kt",
+        diff_accept = "co",
+        diff_theirs = "ct",
+        diff_next = "]x",
+        diff_prev = "[x",
       },
       behaviour = {
         auto_suggestions = false,
         auto_set_highlight_group = true,
         auto_apply_diff_after_generation = false,
+        show_tool_calls = false,
       },
-      claude = {
-        model = "claude-3-5-sonnet-20241022",
-        timeout = 30000,
-        temperature = 0,
-        max_tokens = 4096,
+      providers = {
+        openrouter = {
+          __inherited_from = "openai",  -- Required for OpenAI-compatible!
+          endpoint = "https://openrouter.ai/api/v1",
+          api_key_name = "OPENROUTER_API_KEY",
+          model = "deepseek/deepseek-v3.2",
+          timeout = 30000,
+          extra_request_body = {
+            temperature = 0,
+            max_tokens = 4096,
+          },
+        },
       },
-      -- OpenRouter example (uncomment if using)
-      -- openrouter = {
-      --   endpoint = "https://openrouter.ai/api/v1",
-      --   model = "anthropic/claude-3-5-sonnet",
-      -- },
     },
     build = "make",
     dependencies = {
@@ -594,8 +621,14 @@ require('lazy').setup({
       "nvim-lua/plenary.nvim",
       "MunifTanjim/nui.nvim",
     },
+    -- Zen & other keys (mappings ignores zen)
+    keys = {
+      { "<Esc>z", function() require("avante.api").zen_mode() end, desc = "Avante: Zen" },
+      { "<Esc>l", function() require("avante.api").ask() end, desc = "Avante: Ask", mode = {"n", "v"} },
+      { "<Esc>i", function() require("avante.api").edit() end, desc = "Avante: Edit", mode = {"n", "v"} },
+      { "<Esc>r", function() require("avante.api").refresh() end, desc = "Avante: Refresh", mode = "v" },
+    },
   },
-
 
 })
 
@@ -1122,7 +1155,8 @@ local function disable_copilot_by_path()
   --    end
   --  end
   -- vim.cmd 'Copilot disable'
-  if current_file:match '/Users/bkancherla/git/' then
+  -- if current_file:match '/Users/bkancherla/git/' then
+  if current_file:match '/Users/bkancherla/' then
     vim.opt.completeopt = { 'menu', 'menuone', 'noselect' }
     -- require 'lsp' -- CiderLSP
     -- require 'diagnostics' -- Diagnostics
@@ -1159,19 +1193,19 @@ vim.api.nvim_create_autocmd('BufNewFile', {
       'BLUE="\\e[0;34m"',
       'NC="\\e[0m" # No Color',
       '',
-      'function ECHO_RED() {',
+      'function red() {',
       '  echo -e "${RED}$1${NC}"',
       '}',
-      'function ECHO_GREEN() {',
+      'function green() {',
       '  echo -e "${GREEN}$1${NC}"',
       '}',
-      'function ECHO_YELLOW() {',
+      'function yellow() {',
       '  echo -e "${YELLOW}$1${NC}"',
       '}',
-      'function ECHO_BLUE() {',
+      'function blue() {',
       '  echo -e "${BLUE}$1${NC}"',
       '}',
-      'function ECHO_NC() {',
+      'function nocolor() {',
       '  echo -e "${NC}$1${NC}"',
       '}',
       '',
