@@ -569,66 +569,119 @@ require('lazy').setup({
       end, { desc = '[S]earch [N]eovim files' })
     end,
   },
-
   {
-    "yetone/avante.nvim",
-    event = "VeryLazy",
-    lazy = false,
-    version = false,
-    opts = {
-      windows = {
-        icons = {
-          enabled = true,
+    "BlinkResearchLabs/blink-edit.nvim",
+    dependencies = { "saghen/blink.cmp" }, -- Optional: better if you already use blink.cmp
+    config = function()
+      require("blink-edit").setup({
+        -- llm = {
+        --   provider = "generic",
+        --   backend = "openai",
+        --   url = "http://localhost:6202",
+        --   -- Must match the 'id' from your curl: "qwen3-4b"
+        --   model = "qwen3-4b",
+        --   temperature = 0.0,           -- Keep completion deterministic
+        --   max_tokens = 256,
+        -- },
+        -- llm = {
+        --   provider = "generic",
+        --   backend = "openai",
+        --   url = "http://localhost:6201",
+        --   model = "qwen2.5-coder-7b",
+        --   -- Qwen2.5 specific FIM tokens (usually handled by 'generic' or 'zeta' provider)
+        --   template = "<|fim_prefix|>{{{prefix}}}<|fim_suffix|>{{{suffix}}}<|fim_middle|>"
+        -- },
+        llm = { provider = "sweep", backend = "openai", url = "http://localhost:6202", model = "sweep" },
+        -- Increase the allowed time for a response
+        request_timeout_ms = 10000, -- 10 seconds (way more than enough for M4 Max)
+        debounce_ms = 300,
+        keymaps = {
+          accept = "<C-y>",      -- This is what the UI reads to show the hint
+          accept_line = "<C-j>", -- This changes the line hint
+          clear = "<C-]>",
         },
-      },
-      provider = "openrouter",
-      mappings = {
-        ask = "<Esc>l",
-        edit = "<Esc>i",
-        refresh = "<Esc>r",
-        switch_provider = "<leader>kS",
-        toggle_use_token_file = "<leader>kt",
-        diff_accept = "co",
-        diff_theirs = "ct",
-        diff_next = "]x",
-        diff_prev = "[x",
-      },
-      behaviour = {
-        auto_suggestions = false,
-        auto_set_highlight_group = true,
-        auto_apply_diff_after_generation = false,
-        show_tool_calls = false,
-      },
-      providers = {
-        openrouter = {
-          __inherited_from = "openai",  -- Required for OpenAI-compatible!
-          endpoint = "https://openrouter.ai/api/v1",
-          api_key_name = "OPENROUTER_API_KEY",
-          model = "deepseek/deepseek-v3.2",
-          timeout = 30000,
-          extra_request_body = {
-            temperature = 0,
-            max_tokens = 4096,
-          },
+        -- Context settings to respect your 16k limit
+        context = {
+          max_tokens = 8192,           -- Leave room for the model to think
         },
-      },
-    },
-    build = "make",
-    dependencies = {
-      "nvim-treesitter/nvim-treesitter",
-      "nvim-tree/nvim-web-devicons",
-      "stevearc/dressing.nvim",
-      "nvim-lua/plenary.nvim",
-      "MunifTanjim/nui.nvim",
-    },
-    -- Zen & other keys (mappings ignores zen)
-    keys = {
-      { "<Esc>z", function() require("avante.api").zen_mode() end, desc = "Avante: Zen" },
-      { "<Esc>l", function() require("avante.api").ask() end, desc = "Avante: Ask", mode = {"n", "v"} },
-      { "<Esc>i", function() require("avante.api").edit() end, desc = "Avante: Edit", mode = {"n", "v"} },
-      { "<Esc>r", function() require("avante.api").refresh() end, desc = "Avante: Refresh", mode = "v" },
-    },
+        ui = {
+          show_accept_hint = false, -- This removes the '-> Tab' text entirely
+        }
+      })
+    end,
   },
+
+--   {
+--     "yetone/avante.nvim",
+--     event = "VeryLazy",
+--     lazy = false,
+--     version = false,
+--     opts = {
+--       windows = {
+--         icons = {
+--           enabled = true,
+--         },
+--       },
+--       provider = "openrouter",
+--       mappings = {
+--         ask = "<Esc>l",
+--         edit = "<Esc>i",
+--         refresh = "<Esc>r",
+--         switch_provider = "<leader>kS",
+--         toggle_use_token_file = "<leader>kt",
+--         diff_accept = "co",
+--         diff_theirs = "ct",
+--         diff_next = "]x",
+--         diff_prev = "[x",
+--       },
+--       behaviour = {
+--         auto_suggestions = false,
+--         auto_set_highlight_group = true,
+--         auto_apply_diff_after_generation = false,
+--         show_tool_calls = false,
+--       },
+--       providers = {
+--         openrouter = {
+--           __inherited_from = "openai",  -- Required for OpenAI-compatible!
+--           endpoint = "https://openrouter.ai/api/v1",
+--           api_key_name = "OPENROUTER_API_KEY",
+--           model = "deepseek/deepseek-v3.2",
+--           timeout = 30000,
+--           extra_request_body = {
+--             temperature = 0,
+--             max_tokens = 4096,
+--           },
+--         },
+--         openai = {
+--           endpoint = "http://localhost:6200/v1",  -- Your llama-server
+--           api_key = "local",                     -- Dummy key for local
+--           model = "local",              -- Your --alias
+--           ["local"] = true,
+--           extra_request_body = {
+--             temperature = 0.7,
+--             max_tokens = 4096,
+--             stream = true,
+--             tools = nil,  -- Explicit tool disable
+--           },
+--         },
+--       },
+--     },
+--     build = "make",
+--     dependencies = {
+--       "nvim-treesitter/nvim-treesitter",
+--       "nvim-tree/nvim-web-devicons",
+--       "stevearc/dressing.nvim",
+--       "nvim-lua/plenary.nvim",
+--       "MunifTanjim/nui.nvim",
+--     },
+--     -- Zen & other keys (mappings ignores zen)
+--     keys = {
+--       { "<Esc>z", function() require("avante.api").zen_mode() end, desc = "Avante: Zen" },
+--       { "<Esc>l", function() require("avante.api").ask() end, desc = "Avante: Ask", mode = {"n", "v"} },
+--       { "<Esc>i", function() require("avante.api").edit() end, desc = "Avante: Edit", mode = {"n", "v"} },
+--       { "<Esc>r", function() require("avante.api").refresh() end, desc = "Avante: Refresh", mode = "v" },
+--     },
+--   },
 
 })
 
@@ -1280,3 +1333,13 @@ vim.api.nvim_create_autocmd("CursorHold", {
     vim.diagnostic.open_float(nil, { focusable = false })
   end,
 })
+
+-- FORCE the keymaps manually here
+vim.keymap.set('i', '<C-y>', function()
+  require("blink-edit").accept()
+end, { desc = "AI Accept" })
+
+vim.keymap.set('i', '<C-j>', function()
+  require("blink-edit").accept_line()
+end, { desc = "AI Accept Line" })
+
