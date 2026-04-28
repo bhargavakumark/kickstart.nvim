@@ -121,7 +121,8 @@ vim.opt.number = true
 -- vim.opt.relativenumber = true
 
 -- Enable mouse mode, can be useful for resizing splits for example!
-vim.opt.mouse = 'a'
+vim.opt.mouse = 'a' -- Disabled as might be interferring with ghostty select and copy
+vim.keymap.set('v', '<D-c>', '"+y', { noremap = true, silent = true })
 
 -- Don't show the mode, since it's already in the status line
 vim.opt.showmode = false
@@ -282,9 +283,10 @@ require('lazy').setup({
     priority = 1000, -- Load before most other plugins
     -- Optional: If it requires treesitter: dependencies = { "nvim-treesitter/nvim-treesitter" }
   },
-  {
-     'ntpeters/vim-better-whitespace',
-  },
+  -- Using `highlight ExtraWhitespace` instead of this now
+  -- {
+  --    'ntpeters/vim-better-whitespace',
+  -- },
   -- Here is a more advanced example where we pass configuration
   -- options to `gitsigns.nvim`. This is equivalent to the following Lua:
   --    require('gitsigns').setup({ ... })
@@ -536,7 +538,8 @@ require('lazy').setup({
       vim.keymap.set('n', '<leader>sh', builtin.help_tags, { desc = '[S]earch [H]elp' })
       vim.keymap.set('n', '<leader>sk', builtin.keymaps, { desc = '[S]earch [K]eymaps' })
       vim.keymap.set('n', '<leader>sf', builtin.find_files, { desc = '[S]earch [F]iles' })
-      vim.keymap.set('n', '<Esc>p', builtin.find_files, { desc = '[S]earch [F]iles' })
+      vim.keymap.set('n', '<Esc>p', builtin.find_files, { desc = '[S]earch [F]iles' }) -- For iterm2
+      vim.keymap.set('n', '<C-p>', builtin.find_files, { desc = '[S]earch [F]iles' })
       vim.keymap.set('n', '<leader>ss', builtin.builtin, { desc = '[S]earch [S]elect Telescope' })
       vim.keymap.set('n', '<leader>sw', builtin.grep_string, { desc = '[S]earch current [W]ord' })
       vim.keymap.set('n', '<leader>sg', builtin.live_grep, { desc = '[S]earch by [G]rep' })
@@ -570,46 +573,73 @@ require('lazy').setup({
     end,
   },
   {
-    "BlinkResearchLabs/blink-edit.nvim",
-    dependencies = { "saghen/blink.cmp" }, -- Optional: better if you already use blink.cmp
-    config = function()
-      require("blink-edit").setup({
-        -- llm = {
-        --   provider = "generic",
-        --   backend = "openai",
-        --   url = "http://localhost:6202",
-        --   -- Must match the 'id' from your curl: "qwen3-4b"
-        --   model = "qwen3-4b",
-        --   temperature = 0.0,           -- Keep completion deterministic
-        --   max_tokens = 256,
-        -- },
-        -- llm = {
-        --   provider = "generic",
-        --   backend = "openai",
-        --   url = "http://localhost:6201",
-        --   model = "qwen2.5-coder-7b",
-        --   -- Qwen2.5 specific FIM tokens (usually handled by 'generic' or 'zeta' provider)
-        --   template = "<|fim_prefix|>{{{prefix}}}<|fim_suffix|>{{{suffix}}}<|fim_middle|>"
-        -- },
-        llm = { provider = "sweep", backend = "openai", url = "http://localhost:6202", model = "sweep" },
-        -- Increase the allowed time for a response
-        request_timeout_ms = 10000, -- 10 seconds (way more than enough for M4 Max)
-        debounce_ms = 300,
-        keymaps = {
-          accept = "<C-y>",      -- This is what the UI reads to show the hint
-          accept_line = "<C-j>", -- This changes the line hint
-          clear = "<C-]>",
-        },
-        -- Context settings to respect your 16k limit
-        context = {
-          max_tokens = 8192,           -- Leave room for the model to think
-        },
-        ui = {
-          show_accept_hint = false, -- This removes the '-> Tab' text entirely
-        }
-      })
+    'dmtrKovalenko/fff.nvim',
+    build = function()
+      require("fff.download").download_or_build_binary()
     end,
-  },
+    opts = {
+      debug = { enabled = true, show_scores = true }, -- Enable during trial
+      picker = {
+        winblend = 0, -- Set to 0 to avoid "muddy" background colors with Darcula
+      },
+      layout = {
+        width = 0.98,
+        height = 0.98,
+        prompt_position = 'bottom',
+        preview_position = 'right',
+        preview_size = 0.5,
+      },
+      -- PATH CONFIGURATION:
+      -- "absolute" or "relative" (relative is usually better for core repo)
+      path_display = { "truncate" },
+    },
+    lazy = false, -- Auto lazy-loads
+    keys = {
+      { 'ff', function() require('fff').find_files() end, desc = 'Find files' },
+      { '<leader>fg', function() require('fff').find_in_git_root() end, desc = 'Git files' },
+    },
+  }
+  -- {
+  --   "BlinkResearchLabs/blink-edit.nvim",
+  --   dependencies = { "saghen/blink.cmp" }, -- Optional: better if you already use blink.cmp
+  --   config = function()
+  --     require("blink-edit").setup({
+  --       -- llm = {
+  --       --   provider = "generic",
+  --       --   backend = "openai",
+  --       --   url = "http://localhost:6202",
+  --       --   -- Must match the 'id' from your curl: "qwen3-4b"
+  --       --   model = "qwen3-4b",
+  --       --   temperature = 0.0,           -- Keep completion deterministic
+  --       --   max_tokens = 256,
+  --       -- },
+  --       -- llm = {
+  --       --   provider = "generic",
+  --       --   backend = "openai",
+  --       --   url = "http://localhost:6201",
+  --       --   model = "qwen2.5-coder-7b",
+  --       --   -- Qwen2.5 specific FIM tokens (usually handled by 'generic' or 'zeta' provider)
+  --       --   template = "<|fim_prefix|>{{{prefix}}}<|fim_suffix|>{{{suffix}}}<|fim_middle|>"
+  --       -- },
+  --       llm = { provider = "sweep", backend = "openai", url = "http://localhost:6202", model = "sweep" },
+  --       -- Increase the allowed time for a response
+  --       request_timeout_ms = 10000, -- 10 seconds (way more than enough for M4 Max)
+  --       debounce_ms = 300,
+  --       keymaps = {
+  --         accept = "<C-y>",      -- This is what the UI reads to show the hint
+  --         accept_line = "<C-j>", -- This changes the line hint
+  --         clear = "<C-]>",
+  --       },
+  --       -- Context settings to respect your 16k limit
+  --       context = {
+  --         max_tokens = 8192,           -- Leave room for the model to think
+  --       },
+  --       ui = {
+  --         show_accept_hint = false, -- This removes the '-> Tab' text entirely
+  --       }
+  --     })
+  --   end,
+  -- },
 
 --   {
 --     "yetone/avante.nvim",
@@ -1005,10 +1035,10 @@ let g:gitgutter_set_sign_backgrounds = 0
 " load
 "-- Whitespace highlight --
 "match ExtraWhitespace /\s\+$/
-autocmd BufWinEnter * match ExtraWhitespace /\s\+$/
-autocmd InsertEnter * match ExtraWhitespace /\s\+\%#\@<!$/
-autocmd InsertLeave * match ExtraWhitespace /\s\+$/
-autocmd BufWinLeave * call clearmatches()
+" autocmd BufWinEnter * match ExtraWhitespace /\s\+$/
+" autocmd InsertEnter * match ExtraWhitespace /\s\+\%#\@<!$/
+" autocmd InsertLeave * match ExtraWhitespace /\s\+$/
+" autocmd BufWinLeave * call clearmatches()
 
 ": spell corrections
 :iabbrev teh the
@@ -1213,7 +1243,7 @@ local function disable_copilot_by_path()
     vim.opt.completeopt = { 'menu', 'menuone', 'noselect' }
     -- require 'lsp' -- CiderLSP
     -- require 'diagnostics' -- Diagnostics
-    vim.cmd 'Copilot disable'
+    vim.cmd 'Copilot enable'
   end
 end
 
@@ -1343,3 +1373,73 @@ vim.keymap.set('i', '<C-j>', function()
   require("blink-edit").accept_line()
 end, { desc = "AI Accept Line" })
 
+-- Highlight trailing whitespace in all buffers, but exclude certain filetypes and special windows
+-- Define the look of the highlight (Red background)
+vim.cmd([[highlight ExtraWhitespace guibg=#ff5f87 ctermbg=red]])
+
+-- Define which filetypes should NEVER show trailing whitespace highlights
+local excluded_filetypes = {
+  'fff',
+  'NvimTree',
+  'TelescopePrompt',
+  'TelescopeResults',
+  'notify',
+  'help',
+  'lazy',
+  'avail',
+  'checkhealth',
+}
+
+local whitespace_group = vim.api.nvim_create_augroup('WhitespaceHighlight', { clear = true })
+
+-- Function to check if we should apply the highlight
+local function toggle_whitespace()
+  -- Check 1: Is the filetype in our list?
+  local is_excluded_ft = vim.tbl_contains(excluded_filetypes, vim.bo.filetype)
+
+  -- Check 2: Is it a floating/special window? (fff uses 'nofile' or 'terminal')
+  local is_special_buffer = vim.bo.buftype ~= ""
+
+  if is_excluded_ft or is_special_buffer then
+    vim.cmd('match ExtraWhitespace //') -- Clear match
+  else
+    vim.cmd([[match ExtraWhitespace /\s\+$/]]) -- Apply match
+  end
+end
+
+-- Highlight trailing spaces when entering a buffer
+vim.api.nvim_create_autocmd({ 'BufWinEnter', 'InsertLeave', 'BufEnter' }, {
+  group = whitespace_group,
+  callback = toggle_whitespace,
+})
+
+-- Prevent highlighting the space at the end of the line while typing
+vim.api.nvim_create_autocmd('InsertEnter', {
+  group = whitespace_group,
+  callback = function()
+    local is_excluded_ft = vim.tbl_contains(excluded_filetypes, vim.bo.filetype)
+    local is_special_buffer = vim.bo.buftype ~= ""
+
+    if not (is_excluded_ft or is_special_buffer) then
+      vim.cmd([[match ExtraWhitespace /\s\+\%#\@<!$/]])
+    end
+  end,
+})
+
+-- Clean up when leaving
+vim.api.nvim_create_autocmd('BufWinLeave', {
+  group = whitespace_group,
+  command = 'call clearmatches()',
+})
+-- END: Highlight trailing whitespace in all buffers, but exclude certain filetypes and special windows
+
+
+-- Disable word wrap for .out and .output files
+vim.api.nvim_create_autocmd("BufReadPre", {
+  pattern = { "*.out", "*.output" },
+  callback = function()
+    vim.opt_local.wrap = false
+    -- Optional: also enable horizontal scrolling with mouse if needed
+    vim.opt_local.sidescroll = 1
+  end,
+})
