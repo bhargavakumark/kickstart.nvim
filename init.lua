@@ -1436,7 +1436,7 @@ vim.api.nvim_create_autocmd('BufWinLeave', {
 
 -- Disable word wrap for .out and .output files
 vim.api.nvim_create_autocmd("BufReadPre", {
-  pattern = { "*.out", "*.output" },
+  pattern = { "*.out", "*.output", "*.list" },
   callback = function()
     vim.opt_local.wrap = false
     -- Optional: also enable horizontal scrolling with mouse if needed
