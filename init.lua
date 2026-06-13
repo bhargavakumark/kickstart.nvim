@@ -240,10 +240,6 @@ require('lazy').setup({
   -- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
   'tpope/vim-sleuth', -- Detect tabstop and shiftwidth automatically
 
-  --{
-  --  'ggml-org/llama.vim',
-  --},
-
   {
     "nvim-tree/nvim-web-devicons",
     lazy = false,  -- Eager load for avante
@@ -284,9 +280,6 @@ require('lazy').setup({
     -- Optional: If it requires treesitter: dependencies = { "nvim-treesitter/nvim-treesitter" }
   },
   -- Using `highlight ExtraWhitespace` instead of this now
-  -- {
-  --    'ntpeters/vim-better-whitespace',
-  -- },
   -- Here is a more advanced example where we pass configuration
   -- options to `gitsigns.nvim`. This is equivalent to the following Lua:
   --    require('gitsigns').setup({ ... })
@@ -598,120 +591,9 @@ require('lazy').setup({
       { 'ff', function() require('fff').find_files() end, desc = 'Find files' },
       { '<leader>fg', function() require('fff').find_in_git_root() end, desc = 'Git files' },
     },
-  }
-  -- {
-  --   "BlinkResearchLabs/blink-edit.nvim",
-  --   dependencies = { "saghen/blink.cmp" }, -- Optional: better if you already use blink.cmp
-  --   config = function()
-  --     require("blink-edit").setup({
-  --       -- llm = {
-  --       --   provider = "generic",
-  --       --   backend = "openai",
-  --       --   url = "http://localhost:6202",
-  --       --   -- Must match the 'id' from your curl: "qwen3-4b"
-  --       --   model = "qwen3-4b",
-  --       --   temperature = 0.0,           -- Keep completion deterministic
-  --       --   max_tokens = 256,
-  --       -- },
-  --       -- llm = {
-  --       --   provider = "generic",
-  --       --   backend = "openai",
-  --       --   url = "http://localhost:6201",
-  --       --   model = "qwen2.5-coder-7b",
-  --       --   -- Qwen2.5 specific FIM tokens (usually handled by 'generic' or 'zeta' provider)
-  --       --   template = "<|fim_prefix|>{{{prefix}}}<|fim_suffix|>{{{suffix}}}<|fim_middle|>"
-  --       -- },
-  --       llm = { provider = "sweep", backend = "openai", url = "http://localhost:6202", model = "sweep" },
-  --       -- Increase the allowed time for a response
-  --       request_timeout_ms = 10000, -- 10 seconds (way more than enough for M4 Max)
-  --       debounce_ms = 300,
-  --       keymaps = {
-  --         accept = "<C-y>",      -- This is what the UI reads to show the hint
-  --         accept_line = "<C-j>", -- This changes the line hint
-  --         clear = "<C-]>",
-  --       },
-  --       -- Context settings to respect your 16k limit
-  --       context = {
-  --         max_tokens = 8192,           -- Leave room for the model to think
-  --       },
-  --       ui = {
-  --         show_accept_hint = false, -- This removes the '-> Tab' text entirely
-  --       }
-  --     })
-  --   end,
-  -- },
+}
 
---   {
---     "yetone/avante.nvim",
---     event = "VeryLazy",
---     lazy = false,
---     version = false,
---     opts = {
---       windows = {
---         icons = {
---           enabled = true,
---         },
---       },
---       provider = "openrouter",
---       mappings = {
---         ask = "<Esc>l",
---         edit = "<Esc>i",
---         refresh = "<Esc>r",
---         switch_provider = "<leader>kS",
---         toggle_use_token_file = "<leader>kt",
---         diff_accept = "co",
---         diff_theirs = "ct",
---         diff_next = "]x",
---         diff_prev = "[x",
---       },
---       behaviour = {
---         auto_suggestions = false,
---         auto_set_highlight_group = true,
---         auto_apply_diff_after_generation = false,
---         show_tool_calls = false,
---       },
---       providers = {
---         openrouter = {
---           __inherited_from = "openai",  -- Required for OpenAI-compatible!
---           endpoint = "https://openrouter.ai/api/v1",
---           api_key_name = "OPENROUTER_API_KEY",
---           model = "deepseek/deepseek-v3.2",
---           timeout = 30000,
---           extra_request_body = {
---             temperature = 0,
---             max_tokens = 4096,
---           },
---         },
---         openai = {
---           endpoint = "http://localhost:6200/v1",  -- Your llama-server
---           api_key = "local",                     -- Dummy key for local
---           model = "local",              -- Your --alias
---           ["local"] = true,
---           extra_request_body = {
---             temperature = 0.7,
---             max_tokens = 4096,
---             stream = true,
---             tools = nil,  -- Explicit tool disable
---           },
---         },
---       },
---     },
---     build = "make",
---     dependencies = {
---       "nvim-treesitter/nvim-treesitter",
---       "nvim-tree/nvim-web-devicons",
---       "stevearc/dressing.nvim",
---       "nvim-lua/plenary.nvim",
---       "MunifTanjim/nui.nvim",
---     },
---     -- Zen & other keys (mappings ignores zen)
---     keys = {
---       { "<Esc>z", function() require("avante.api").zen_mode() end, desc = "Avante: Zen" },
---       { "<Esc>l", function() require("avante.api").ask() end, desc = "Avante: Ask", mode = {"n", "v"} },
---       { "<Esc>i", function() require("avante.api").edit() end, desc = "Avante: Edit", mode = {"n", "v"} },
---       { "<Esc>r", function() require("avante.api").refresh() end, desc = "Avante: Refresh", mode = "v" },
---     },
---   },
+
 
 })
 
@@ -819,87 +701,7 @@ vim.lsp.config('gopls', {
 })
 
 
--- ========================================================
--- LSP Configuration (Addressing Deprecation Warning)
--- ========================================================
-
---
--- -- Define constants (assumes default Mason paths)
--- local MASON_PATH = vim.fn.expand('~/.local/share/nvim/mason')
--- local JDTLS_PATH = MASON_PATH .. '/packages/jdtls'
--- local JDEBUG_PATH = MASON_PATH .. '/packages/java-debug-adapter'
--- local util = require('lspconfig.util')
---
--- -- Function to generate the full JDTLS config table
--- local jdtls_config = function()
---     local root_dir = util.root_pattern('pom.xml', 'build.gradle', '.git')()
---
---     -- Ensure the workspace directory is unique per project and outside the project root
---     local workspace_folder = MASON_PATH .. '/jdtls_workspaces/' .. vim.fn.fnamemodify(root_dir, ':p:h:t')
---
---     -- Gather Java Debug Adapter JARs (required)
---     local bundles = {}
---     vim.list_extend(bundles, vim.split(vim.fn.glob(JDEBUG_PATH .. '/extension/server/*.jar'), '\n'))
---     vim.list_extend(bundles, vim.split(vim.fn.glob(JDEBUG_PATH .. '/extension/server/lib/*.jar'), '\n'))
---
---     local cmd = {
---         'java',
---         '-Declipse.application=org.eclipse.jdt.ls.core.id1',
---         '-Dosgi.bundles.defaultStartLevel=4',
---         '-Declipse.product=org.eclipse.jdt.ls.core.product',
---         '-Dlog.protocol=true',
---         '-Dlog.level=ALL',
---         '-Xmx1G', -- Adjust memory limit as needed
---         '--add-modules=ALL-SYSTEM',
---         '--add-opens', 'java.base/java.util=ALL-UNNAMED',
---         '--add-opens', 'java.base/java.lang=ALL-UNNAMED',
---         '-jar', vim.fn.glob(JDTLS_PATH .. '/plugins/org.eclipse.equinox.launcher_*.jar'),
---         '-configuration', JDTLS_PATH .. '/config_mac', -- <<< CHECK/CHANGE THIS: Use config_linux for Linux
---         '-data', workspace_folder
---     }
---
---     -- Final configuration table
---     return {
---         cmd = cmd,
---         root_dir = root_dir,
---         -- You can define shared on_attach functions here
---         on_attach = function(client, bufnr)
---             vim.notify("LSP attached to JDTLS!", vim.log.levels.INFO)
---         end,
---         settings = {
---             java = {
---                 content = { version = 17 }, -- Specify target JDK version
---             },
---         },
---     }
--- end
---
--- -- Setup Mason and Mason-LSPConfig
--- require('mason').setup()
---
--- -- Use the modern method: Setup handlers for specific servers via mason-lspconfig.
--- -- This guarantees the setup is called correctly after the server is installed.
--- require('mason-lspconfig').setup {
---     -- Use an empty setup table for all other servers (e.g., bashls, pyright)
---     ensure_installed = {},
---     handlers = {
---         -- The JDTLS configuration must be defined here, as a function:
---         ["jdtls"] = function()
---             -- We call the native setup method but pass our full custom config
---             require('lspconfig').jdtls.setup(jdtls_config())
---         end,
---
---         -- Default handler for all other Mason-installed servers:
---         ["_"] = function(server_name)
---             require('lspconfig')[server_name].setup({})
---         end,
---     },
--- }
-
 -- Allows snippets to handle <Tab> for final jumps. from hrsh7th/.*vsnip
-vim.g.vsnip_append_final_tabstop = 1 -- Lua
-vim.g.vsnip_deactivate_on = 'InsertLeave'
-
 -- Start bash-language-server for bash LSP, instructions from
 -- https://github.com/bash-lsp/bash-language-server?tab=readme-ov-file#neovim
 vim.api.nvim_create_autocmd('FileType', {
@@ -928,117 +730,35 @@ set encoding=utf-8
 set runtimepath^=~/.nvim runtimepath+=~/.nvim/after
 let &packpath = &runtimepath
 
-"set number relativenumber
-set number
-:nmap <F5> :set nonumber<CR>
-set exrc " .vimrc in local project dir
+set exrc
 set secure
 
-" When moving with ctrl+], this save buffer hidden
 set hidden
 set confirm
 
-set foldmethod=indent   "fold based on indent
-set foldnestmax=10      "deepest fold is 10 levels
-set nofoldenable        "dont fold by default
-set foldlevel=1         "this is just what i use
+set foldmethod=indent
+set foldnestmax=10
+set nofoldenable
+set foldlevel=1
 
-set diffopt+=vertical   "start diff in vertical mode
+set diffopt+=vertical
 
-"Below for \t tab alignments
-":set shiftwidth=8
-":set tabstop=8 softtabstop=8 shiftwidth=8 noexpandtab
-"Below for 4 space tab aligments
-":set tabstop=8 softtabstop=4 shiftwidth=4 noexpandtab
-:set shiftwidth=4 tabstop=4 softtabstop=4 shiftwidth=4 expandtab
+set shiftwidth=4 tabstop=4 softtabstop=4 shiftwidth=4 expandtab
 if has("autocmd")
-    " For java files use \t as separator
-    autocmd BufRead,BufNewFile *.java :set shiftwidth=2 tabstop=2 softtabstop=2 shiftwidth=2 expandtab
-    autocmd BufRead,BufNewFile *.js :set shiftwidth=2 tabstop=2 softtabstop=2 shiftwidth=2 expandtab
-    autocmd BufRead,BufNewFile *.cpp :set shiftwidth=4 tabstop=4 softtabstop=4 shiftwidth=4 expandtab
-    "autocmd BufRead,BufNewFile *.cpp :set shiftwidth=2 tabstop=2 softtabstop=2 shiftwidth=2 expandtab
-    "autocmd BufRead,BufNewFile *.sh :set shiftwidth=4 tabstop=4 softtabstop=4 shiftwidth=4 expandtab
-    autocmd BufRead,BufNewFile *.sh :set shiftwidth=2 tabstop=2 softtabstop=2 shiftwidth=2 expandtab
-    autocmd BufRead,BufNewFile *bashrc_common :set shiftwidth=2 tabstop=2 softtabstop=2 shiftwidth=2 expandtab
-    autocmd BufRead,BufNewFile *.bash :set shiftwidth=2 tabstop=2 softtabstop=2 shiftwidth=2 expandtab
-    autocmd BufRead,BufNewFile gob :set shiftwidth=2 tabstop=2 softtabstop=2 shiftwidth=2 expandtab
-    autocmd BufRead,BufNewFile *.pl :set shiftwidth=8 tabstop=8 softtabstop=8 shiftwidth=8 noexpandtab
-    autocmd BufRead,BufNewFile *.go :set shiftwidth=8 tabstop=8 softtabstop=8 shiftwidth=8 noexpandtab
-    autocmd BufRead,BufNewFile *.yaml :set shiftwidth=2 tabstop=2 softtabstop=2 shiftwidth=2 expandtab
-    autocmd BufRead,BufNewFile *.md :set shiftwidth=2 tabstop=2 softtabstop=2 shiftwidth=2 expandtab
-    autocmd BufRead,BufNewFile *.json :set shiftwidth=2 tabstop=2 softtabstop=2 shiftwidth=2 expandtab
-    autocmd BufRead,BufNewFile *.lua :set shiftwidth=2 tabstop=2 softtabstop=2 shiftwidth=2 expandtab
+  autocmd BufRead,BufNewFile *.java :set shiftwidth=2 tabstop=2 softtabstop=2 shiftwidth=2 expandtab
+  autocmd BufRead,BufNewFile *.js :set shiftwidth=2 tabstop=2 softtabstop=2 shiftwidth=2 expandtab
+  autocmd BufRead,BufNewFile *.cpp :set shiftwidth=4 tabstop=4 softtabstop=4 shiftwidth=4 expandtab
+  autocmd BufRead,BufNewFile *.sh :set shiftwidth=2 tabstop=2 softtabstop=2 shiftwidth=2 expandtab
+  autocmd BufRead,BufNewFile *bashrc_common :set shiftwidth=2 tabstop=2 softtabstop=2 shiftwidth=2 expandtab
+  autocmd BufRead,BufNewFile *.bash :set shiftwidth=2 tabstop=2 softtabstop=2 shiftwidth=2 expandtab
+  autocmd BufRead,BufNewFile gob :set shiftwidth=2 tabstop=2 softtabstop=2 shiftwidth=2 expandtab
+  autocmd BufRead,BufNewFile *.pl :set shiftwidth=8 tabstop=8 softtabstop=8 shiftwidth=8 noexpandtab
+  autocmd BufRead,BufNewFile *.go :set shiftwidth=8 tabstop=8 softtabstop=8 shiftwidth=8 noexpandtab
+  autocmd BufRead,BufNewFile *.yaml :set shiftwidth=2 tabstop=2 softtabstop=2 shiftwidth=2 expandtab
+  autocmd BufRead,BufNewFile *.md :set shiftwidth=2 tabstop=2 softtabstop=2 shiftwidth=2 expandtab
+  autocmd BufRead,BufNewFile *.json :set shiftwidth=2 tabstop=2 softtabstop=2 shiftwidth=2 expandtab
+  autocmd BufRead,BufNewFile *.lua :set shiftwidth=2 tabstop=2 softtabstop=2 shiftwidth=2 expandtab
 endif
-
-" pathogen
-"execute pathogen#infect()
-
-" Use deoplete.
-let g:deoplete#enable_at_startup = 1
-"  Run UpdateRemotePlugins it not loading
-
-"-- TRUE COLOR --
-" For Neovim 0.1.3 and 0.1.4 - https://github.com/neovim/neovim/pull/2198
-if (has('nvim'))
-  let $NVIM_TUI_ENABLE_TRUE_COLOR = 1
-endif
-
-" For Neovim > 0.1.5 and Vim > patch 7.4.1799 - https://github.com/vim/vim/commit/61be73bb0f965a895bfb064ea3e55476ac175162
-" Based on Vim patch 7.4.1770 (`guicolors` option) - https://github.com/vim/vim/commit/8a633e3427b47286869aa4b96f2bfc1fe65b25cd
-" https://github.com/neovim/neovim/wiki/Following-HEAD#20160511
-if (has("termguicolors") && $TERM_PROGRAM ==# 'iTerm.app')
-  set termguicolors
-endif
-
-" pathogen
-"execute pathogen#infect()
-
-" Use deoplete.
-let g:deoplete#enable_at_startup = 1
-"  Run UpdateRemotePlugins it not loading
-
-"-- TRUE COLOR --
-" For Neovim 0.1.3 and 0.1.4 - https://github.com/neovim/neovim/pull/2198
-if (has('nvim'))
-  let $NVIM_TUI_ENABLE_TRUE_COLOR = 1
-endif
-
-" For Neovim > 0.1.5 and Vim > patch 7.4.1799 - https://github.com/vim/vim/commit/61be73bb0f965a895bfb064ea3e55476ac175162
-" Based on Vim patch 7.4.1770 (`guicolors` option) - https://github.com/vim/vim/commit/8a633e3427b47286869aa4b96f2bfc1fe65b25cd
-" https://github.com/neovim/neovim/wiki/Following-HEAD#20160511
-if (has("termguicolors") && $TERM_PROGRAM ==# 'iTerm.app')
-  set termguicolors
-endif
-
-"-- THEMING --
-set cursorline          " current line is underlined
-set background=dark
-
-let g:airline_theme='material'
-"let g:material_theme_style = 'darker'
-"colorscheme material
-"colorscheme kanagawa
-"colorscheme darcula-dark
-colorscheme darcula
-
-hi Normal       ctermbg=NONE guibg=NONE
-hi SignColumn   ctermbg=235 guibg=#262626
-hi LineNr       ctermfg=grey guifg=grey ctermbg=NONE guibg=NONE
-hi CursorLineNr ctermbg=NONE guibg=NONE ctermfg=178 guifg=#d7af00
-
-"-- Airline --
-let g:airline#extensions#tabline#enabled = 1
-
-let g:gitgutter_set_sign_backgrounds = 0
-
-" I have put this plugin in ~/.config/nvim/bundle , but it doesn't seem to
-" load
-"-- Whitespace highlight --
-"match ExtraWhitespace /\s\+$/
-" autocmd BufWinEnter * match ExtraWhitespace /\s\+$/
-" autocmd InsertEnter * match ExtraWhitespace /\s\+\%#\@<!$/
-" autocmd InsertLeave * match ExtraWhitespace /\s\+$/
-" autocmd BufWinLeave * call clearmatches()
 
 ": spell corrections
 :iabbrev teh the
@@ -1076,140 +796,13 @@ let g:gitgutter_set_sign_backgrounds = 0
 :iabbrev depedency dependency
 :iabbrev enviormnent environment
 
-"autocmd VimEnter * wincmd p
-":NERDTreeToggle
-
-nnoremap <leader>n :NERDTreeFocus<CR>
-"nnoremap <C-n> :NERDTree<CR>
-"nnoremap <C-t> :NERDTreeToggle<CR>
-"nnoremap <C-f> :NERDTreeFind<CR>
-
-" Close the tab if NERDTree is the only window remaining in it.
-autocmd BufEnter * if winnr('$') == 1 && exists('b:NERDTree') && b:NERDTree.isTabTree() | quit | endif
-
-" Mirror the NERDTree before showing it. This makes it the same on all tabs.
-nnoremap <C-n> :NERDTreeMirror<CR>:NERDTreeFocus<CR>
-
-
 " open file at the same line as we closed
 if has("autocmd")
   au BufReadPost * if line("'\"") > 0 && line("'\"") <= line("$") | exe "normal! g`\"" | endif
 endif
 
-""-- ALE --
-"hi clear ALEErrorSign
-"hi clear ALEWarningSign
-"let g:ale_echo_msg_format = '[%linter%] %s [%severity%]'
-"let g:ale_sign_error = '‚úò'
-"let g:ale_sign_warning = '‚óã'
-"hi Error    ctermfg=204 ctermbg=NONE guifg=#ff5f87 guibg=NONE
-"hi Warning  ctermfg=178 ctermbg=NONE guifg=#D7AF00 guibg=NONE
-"hi ALEError ctermfg=204 guifg=#ff5f87 ctermbg=52 guibg=#5f0000 cterm=undercurl gui=undercurl
-"hi link ALEErrorSign    Error
-"hi link ALEWarningSign  Warning
-"
-"let g:ale_linters = {
-"            \ 'python': ['pylint'],
-"            \ 'javascript': ['eslint'],
-"            \ 'go': ['gobuild', 'gofmt'],
-"            \ 'rust': ['rls']
-"            \}
-"let g:ale_fixers = {
-"            \ '*': ['remove_trailing_lines', 'trim_whitespace'],
-"            \ 'python': ['autopep8'],
-"            \ 'javascript': ['eslint'],
-"            \ 'go': ['gofmt', 'goimports'],
-"            \ 'rust': ['rustfmt']
-"            \}
-"let g:ale_fix_on_save = 1
-"
-""-- NERDTree --
-"let NERDTreeShowHidden=1
-"
-""-- Airline --
-"let g:airline#extensions#tabline#enabled = 1
-"
-""uo-- NVIM configuration --
-"if has('nvim')
-"    " Enable deoplete when InsertEnter.
-"    let g:deoplete#enable_at_startup = 0
-"    autocmd InsertEnter * call deoplete#enable()
-"
-"    set belloff=""
-"    call deoplete#custom#source('_',  'max_menu_width', 0)
-"    call deoplete#custom#source('_',  'max_abbr_width', 0)
-"    call deoplete#custom#source('_',  'max_kind_width', 0)
-"
-"    set hidden
-"    let g:LanguageClient_serverCommands = {
-"        \ 'rust': ['~/.cargo/bin/rustup', 'run', 'stable', 'rls'],
-"        \ 'go': ['~/.go/bin/gopls']
-"        \ }
-"endif
-
-" Disable gutenttags run on file close
-let g:gutentags_generate_on_write=0
-
-
 set tags=tags;/
 set tags+=~/.vim/tags/cpp_src
-"helptags ~/.vim/doc
-
-"if has("cscope")
-"  set csto=1
-"  set nocst
-"  set nocsverb
-"  " add any database in current directory
-"  if filereadable("cscope.out")
-"    cs add cscope.out
-"    " else add database pointed to by environment
-"  elseif $CSCOPE_DB != ""
-"    cs add $CSCOPE_DB
-"  endif
-"  set csverb
-"endif
-
-" https://vim.fandom.com/wiki/Autoloading_Cscope_Database
-"function! LoadCscope()
-"  let db = findfile("cscope.out", ".;")
-"  if (!empty(db))
-"    let path = strpart(db, 0, match(db, "/cscope.out$"))
-"    set nocscopeverbose " suppress 'duplicate connection' error
-"    exe "cs add " . db . " " . path
-"    set cscopeverbose
-"  " else add the database pointed to by environment variable
-"  elseif $CSCOPE_DB != ""
-"    cs add $CSCOPE_DB
-"  endif
-"endfunction
-"au BufEnter /* call LoadCscope()
-
-set ic
-
-" autocomplete for attached debugger on go
-au FileType dap-repl lua require('dap.ext.autocompl').attach()
-
-" Key bindings for trouble.nvim from https://github.com/folke/trouble.nvim?tab=readme-ov-file#commands
-nnoremap <leader>xx <cmd>TroubleToggle<cr>
-nnoremap <leader>xw <cmd>TroubleToggle workspace_diagnostics<cr>
-nnoremap <leader>xf <cmd>TroubleToggle document_diagnostics<cr>
-nnoremap <leader>xq <cmd>TroubleToggle quickfix<cr>
-nnoremap <leader>xl <cmd>TroubleToggle loclist<cr>
-nnoremap <leader>xr <cmd>TroubleToggle lsp_references<cr>
-
-" vim cycle tabs with gt
-nnoremap gt :tabnext<CR>
-
-
-" Settings from https://groups.google.com/a/google.com/g/vi-users/c/jyVNZjO7Eps/m/Vwn-aqYkBQAJ
-"
-" Not using settings for go as its already being formatted correctly
-augroup autoformat_settings
-"  autocmd FileType bzl AutoFormatBuffer buildifier
-"  autocmd FileType go AutoFormatBuffer gofmt
-"  See go/vim/plugins/codefmt-google, :help codefmt-google and :help codefmt
-"  for details about other available formatters.
-augroup END
 
 " Tab completion
 set wildmode=longest,list,full
@@ -1218,7 +811,6 @@ set wildmode=list:longest
 set winheight=9999
 set so=5
 ]]
-
 --
 -- Disable Copilot for specific file types or paths
 --
@@ -1363,15 +955,6 @@ vim.api.nvim_create_autocmd("CursorHold", {
     vim.diagnostic.open_float(nil, { focusable = false })
   end,
 })
-
--- FORCE the keymaps manually here
-vim.keymap.set('i', '<C-y>', function()
-  require("blink-edit").accept()
-end, { desc = "AI Accept" })
-
-vim.keymap.set('i', '<C-j>', function()
-  require("blink-edit").accept_line()
-end, { desc = "AI Accept Line" })
 
 -- Highlight trailing whitespace in all buffers, but exclude certain filetypes and special windows
 -- Define the look of the highlight (Red background)
