@@ -9,3 +9,6 @@ lazy-lock.json
 bundle
 plugin
 site
+output
+.git-message
+.git.message
