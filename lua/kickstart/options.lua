@@ -55,3 +55,34 @@ vim.opt.hlsearch = true
 -- Clipboard: disable auto-sync with system clipboard
 -- Deletions (dw, dd) go to internal register. Paste from system: "+p
 vim.opt.clipboard = ''
+
+-- Allow local .vimrc in project directories
+vim.opt.exrc = true
+vim.opt.secure = true
+
+-- Keep buffers hidden when abandoned (allows switching without saving)
+vim.opt.hidden = true
+vim.opt.confirm = true
+
+-- Folding
+vim.opt.foldmethod = 'indent'
+vim.opt.foldnestmax = 10
+vim.opt.foldenable = false
+vim.opt.foldlevel = 1
+
+-- Diff mode: start in vertical split
+vim.opt.diffopt:append('vertical')
+
+-- Global tab/indent defaults
+vim.opt.shiftwidth = 4
+vim.opt.tabstop = 4
+vim.opt.softtabstop = 4
+vim.opt.expandtab = true
+
+-- Tags
+vim.opt.tags = { 'tags;/', '~/.vim/tags/cpp_src' }
+
+-- Tab completion
+vim.opt.wildmode = { 'longest', 'list', 'full' }
+-- Note: 'list:longest' set twice below is redundant; keeping the 'longest,list,full' order
+vim.opt.wildmenu = true
