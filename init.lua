@@ -597,56 +597,6 @@ require('lazy').setup({
 
 })
 
-require("nvim-tree").setup({
-    -- Control how the tree view itself behaves
-    view = {
-        -- Set the initial width of the tree window
-        width = 30,
-        -- Set the sidebar position
-        side = 'left',
-    },
-    -- Control how file names and icons are displayed
-    renderer = {
-        -- Group empty folders together for a cleaner look
-        group_empty = true,
-    },
-    -- Filter out files/folders you don't want to see
-    filters = {
-        -- Hide common OS/Git temporary/config files
-        dotfiles = false, -- Set to true to hide files starting with '.'
-        custom = { 'node_modules', '.git', 'vendor' },
-    },
-    -- Enable diagnostics (LSP errors/warnings) to be shown in the tree
-    diagnostics = {
-        enable = true,
-        show_on_dirs = true,
-    },
-    -- Optional: Automatically close nvim-tree when the last buffer is closed
-    on_attach = function(bufnr)
-        local api = require('nvim-tree.api')
-
-        local function opts(desc)
-          return { desc = 'nvim-tree: ' .. desc, buffer = bufnr, noremap = true, silent = true, nowait = true }
-        end
-
-        -- === Standard/Default Maps ===
-        -- These are the maps that likely aren't working for you:
-        vim.keymap.set('n', 'o', api.node.open.tab, opts('Open/Expand'))
-        vim.keymap.set('n', '<CR>', api.node.open.tab, opts('Open/Expand'))
-        vim.keymap.set('n', 'v', api.node.open.vertical, opts('Open Vertical Split'))
-        vim.keymap.set('n', 's', api.node.open.horizontal, opts('Open Horizontal Split'))
-        vim.keymap.set('n', 't', api.node.open.tab, opts('Open in New Tab'))
-
-        -- Other useful maps you might want:
-        vim.keymap.set('n', 'q', api.tree.close, opts('Close'))
-        -- vim.keymap.set('n', 'r', api.tree.reload_all, opts('Refresh'))
-        vim.keymap.set('n', 'R', api.tree.change_root_to_parent, opts('Parent Dir'))
-    end,
-})
-
--- Command to open/close the tree (can be mapped to a key)
-vim.api.nvim_create_user_command('T', 'NvimTreeToggle', {})
-
 -- Based on https://github.com/mfussenegger/nvim-jdtls?tab=readme-ov-file
 local home = os.getenv("HOME")
 local jdtls_path = home .. "/jdt-language-server"
