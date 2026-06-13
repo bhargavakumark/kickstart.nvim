@@ -86,3 +86,6 @@ vim.opt.tags = { 'tags;/', '~/.vim/tags/cpp_src' }
 vim.opt.wildmode = { 'longest', 'list', 'full' }
 -- Note: 'list:longest' set twice below is redundant; keeping the 'longest,list,full' order
 vim.opt.wildmenu = true
+
+-- Use interactive shell so bashrc aliases (gs, gd, gg) work in :! commands
+vim.opt.shellcmdflag = '-ci'
