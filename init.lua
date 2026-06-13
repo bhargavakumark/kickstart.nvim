@@ -242,7 +242,7 @@ require('lazy').setup({
 
   {
     "nvim-tree/nvim-web-devicons",
-    lazy = false,  -- Eager load for avante
+    lazy = false,  -- Eager load for icons (needed by nvim-tree, telescope)
     priority = 1000,
     enabled = true,  -- Override any cond
     config = function()
@@ -271,13 +271,15 @@ require('lazy').setup({
   { 'numToStr/Comment.nvim', opts = {} },
 
   {
-    'xiantang/darcula-dark.nvim', -- Use the correct repo name here
+    'xiantang/darcula-dark.nvim',
     dependencies = {
       "nvim-treesitter/nvim-treesitter",
     },
     lazy = false, -- Load immediately on startup
-    priority = 1000, -- Load before most other plugins
-    -- Optional: If it requires treesitter: dependencies = { "nvim-treesitter/nvim-treesitter" }
+    priority = 1000,
+    config = function()
+      vim.cmd.colorscheme("darcula-dark")
+    end,
   },
   -- Using `highlight ExtraWhitespace` instead of this now
   -- Here is a more advanced example where we pass configuration
@@ -347,10 +349,6 @@ require('lazy').setup({
       --    - Show your current context: https://github.com/nvim-treesitter/nvim-treesitter-context
       --    - Treesitter + textobjects: https://github.com/nvim-treesitter/nvim-treesitter-textobjects
     end,
-  },
-
-  {
-    'doums/darcula',
   },
 
   -- Core LSP/Mason Plugins
