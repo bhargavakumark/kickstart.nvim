@@ -26,5 +26,8 @@ require('kickstart.lsp')
 -- Copilot enable/disable logic
 require('kickstart.copilot')
 
+-- Spell correction abbreviations
+require('kickstart.spell')
+
 -- Utility commands (Openf)
 require('kickstart.util')
