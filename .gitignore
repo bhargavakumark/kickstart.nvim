@@ -10,5 +10,7 @@ bundle
 plugin
 site
 output
+logs
+logs.*
 .git-message
 .git.message
