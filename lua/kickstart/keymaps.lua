@@ -1,9 +1,6 @@
 -- Keymaps
 -- See `:help vim.keymap.set()`
 
--- Clear search highlight on <Esc> in normal mode
-vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
-
 -- Yank to system clipboard with Cmd+C (visual mode)
 vim.keymap.set('v', '<D-c>', '"+y', { noremap = true, silent = true })
 
