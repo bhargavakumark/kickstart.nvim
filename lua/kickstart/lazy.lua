@@ -215,29 +215,5 @@ require('lazy').setup({
     end,
   },
 
-  -- Fuzzy finder alternative (fff)
-  {
-    'dmtrKovalenko/fff.nvim',
-    build = function()
-      require('fff.download').download_or_build_binary()
-    end,
-    opts = {
-      debug = { enabled = true, show_scores = true },
-      picker = {
-        winblend = 0,
-      },
-      layout = {
-        width = 0.98,
-        height = 0.98,
-        prompt_position = 'bottom',
-        preview_position = 'right',
-        preview_size = 0.5,
-      },
-      path_display = { 'truncate' },
-    },
-    keys = {
-      { 'ff', function() require('fff').find_files() end, desc = 'Find files' },
-      { '<leader>fg', function() require('fff').find_in_git_root() end, desc = 'Git files' },
-    },
-  },
+
 })

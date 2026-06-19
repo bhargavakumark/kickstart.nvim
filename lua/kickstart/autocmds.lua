@@ -90,7 +90,6 @@ do
   vim.cmd([[highlight ExtraWhitespace guibg=#ff5f87 ctermbg=red]])
 
   local excluded_filetypes = {
-    'fff',
     'NvimTree',
     'TelescopePrompt',
     'TelescopeResults',
