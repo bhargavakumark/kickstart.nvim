@@ -9,6 +9,7 @@ local project_name = vim.fn.fnamemodify(vim.fn.getcwd(), ':p:h:t')
 local workspace_dir = home .. '/.cache/jdtls/workspace/' .. project_name
 
 vim.lsp.config('jdtls', {
+  filetypes = { 'java' },
   cmd = {
     'java',
     '-Declipse.application=org.eclipse.jdt.ls.core.id1',
@@ -24,7 +25,10 @@ vim.lsp.config('jdtls', {
     '-configuration', jdtls_path .. '/config_mac',
     '-data', workspace_dir,
   },
-  root_dir = vim.fs.root(0, { '.git', 'mvnw', 'gradlew', 'pom.xml' }),
+  root_dir = function(bufnr)
+    return vim.fs.root(bufnr, { '.git', 'mvnw', 'gradlew', 'pom.xml' })
+      or vim.fn.fnamemodify(vim.api.nvim_buf_get_name(bufnr), ':h')
+  end,
   settings = {
     java = {
       signatureHelp = { enabled = true },
