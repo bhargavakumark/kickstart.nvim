@@ -61,10 +61,12 @@ vim.api.nvim_create_autocmd('CursorHold', {
 vim.api.nvim_create_autocmd('FileType', {
   pattern = 'sh',
   callback = function()
-    vim.lsp.start {
-      name = 'bash-language-server',
-      cmd = { '/Users/bkancherla/.nvm/versions/node/v24.11.0/bin/bash-language-server', 'start' },
-    }
+    if vim.fn.executable 'bash-language-server' == 1 then
+      vim.lsp.start {
+        name = 'bash-language-server',
+        cmd = { 'bash-language-server', 'start' },
+      }
+    end
   end,
 })
 
