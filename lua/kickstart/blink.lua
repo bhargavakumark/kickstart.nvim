@@ -1,7 +1,8 @@
 -- Completion (blink.cmp) + AI completion (minuet-ai with DeepSeek)
 --
--- AI completion uses DeepSeek's fill-in-the-middle endpoint:
---   https://api.deepseek.com/beta/completions
+-- AI completion uses DeepSeek's fill-in-the-middle endpoint, reached
+-- through the local gateway at http://127.0.0.1:9904 (direct, no proxy):
+--   http://127.0.0.1:9904/beta/completions
 -- The API key is read from the DEEPSEEK_API_KEY environment variable.
 -- Without the key, the minuet source is skipped entirely so nvim still
 -- starts cleanly with LSP/path/buffer/snippets completion.
@@ -16,6 +17,7 @@ if has_deepseek_key then
     provider_options = {
       openai_fim_compatible = {
         name = 'DeepSeek',
+        end_point = 'http://127.0.0.1:9904/beta/completions',
         optional = {
           max_tokens = 256,
           top_p = 0.9,
