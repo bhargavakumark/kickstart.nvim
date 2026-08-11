@@ -94,10 +94,19 @@ require('lazy').setup({
   { 'williamboman/mason-lspconfig.nvim' },
   { 'mfussenegger/nvim-jdtls' },
 
-  -- Autocompletion
-  { 'hrsh7th/nvim-cmp' },
-  { 'hrsh7th/cmp-nvim-lsp' },
-  { 'L3MON4D3/LuaSnip' },
+  -- Autocompletion (blink.cmp + minuet-ai for DeepSeek AI completion)
+  {
+    'Saghen/blink.cmp',
+    version = '1.*',
+    event = 'InsertEnter',
+    dependencies = {
+      'L3MON4D3/LuaSnip',
+      'milanglacier/minuet-ai.nvim',
+    },
+    config = function()
+      require('kickstart.blink')
+    end,
+  },
 
   -- File explorer sidebar
   {
