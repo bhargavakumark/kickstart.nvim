@@ -14,3 +14,4 @@ logs
 logs.*
 .git-message
 .git.message
+.pi

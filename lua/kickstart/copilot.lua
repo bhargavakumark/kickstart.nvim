@@ -5,7 +5,7 @@ local function disable_copilot_by_path()
 
   if current_file:match '/Users/bkancherla/' then
     vim.opt.completeopt = { 'menu', 'menuone', 'noselect' }
-    vim.cmd 'Copilot enable'
+    vim.cmd 'Copilot disable'
   end
 end
 
